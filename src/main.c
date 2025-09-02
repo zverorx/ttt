@@ -11,6 +11,9 @@
 
 #include "structs.h"
 
+/* The number of lines that the program's stdout occupies */
+#define NUM_OF_LINES	7
+
 /**
  * @brief Error check with cleanup.
  * @param OBJECT Object to check (pointer or int).
@@ -44,7 +47,7 @@ static void print_game_field(struct game *game_ptr);
 static struct game *init_game();
 static void destroy_game(struct game *game_ptr);
 static int8_t input_processing(char *buff, int8_t *row, int8_t *col, char *nickname);
-static void clean_output();
+static void clean_output(int rows);
 
 int main(int argc, char **argv)
 {
@@ -55,13 +58,13 @@ int main(int argc, char **argv)
 	CHECK_ERROR(game_ptr, 'p', MEMORY_ALLOC_ERR);
 
 	/* TODO: Completing the cycle, accounting for used cells */
-	while(game_is_not_over) {
+	while(game_ptr->game_is_not_over) {
 		print_game_field(game_ptr);
 		res_input = input_processing(buff, &row, &col, game_ptr->player_1->nickname);
 		CHECK_ERROR(res_input, 'i', INPUT_ERR);
 
 		game_ptr->field[row][col] = game_ptr->player_1->mark;
-		clean_output();
+		clean_output(NUM_OF_LINES);
 	}
 
 	destroy_game(game_ptr);
@@ -127,7 +130,7 @@ static struct game *init_game()
 	us_ptr->next = NULL;
 
 	/* Assigning fields to the game structure */
-	game_is_not_over = 1;
+	game_ptr->game_is_not_over = 1;
 	game_ptr->used_cells_head = us_ptr;
 	game_ptr->player_1 = p1_ptr;
 	game_ptr->player_2 = p2_ptr;
@@ -212,8 +215,8 @@ static int8_t input_processing(char *buff, int8_t *row, int8_t *col, char *nickn
  *
  * Moves the cursor up line by line, starting from the current position,
  * and erases each line's content using ANSI escape sequences.
- * Assumes that at least 7 lines were previously printed.
- *
+ * 
+ * @param rows Number of lines to clear in terminal
  * @note This function uses ANSI escape codes:
  *       \r      – Carriage return (to start of line)
  *       \033[2K – Clear entire line
@@ -222,10 +225,10 @@ static int8_t input_processing(char *buff, int8_t *row, int8_t *col, char *nickn
  * @warning Behavior is undefined if fewer than 7 lines were printed.
  * 
  */
-static void clean_output()
+static void clean_output(int rows)
 {
 	printf("\r\033[2K\033[A");
-	for (int i = 0; i < 6; i++) {
+	for (int i = 1; i < rows; i++) {
 		printf("\033[2K\033[A");
 	}
 	fflush(stdout);
