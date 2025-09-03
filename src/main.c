@@ -13,20 +13,6 @@
 /* The number of lines that the program's stdout occupies */
 #define NUM_OF_LINES	7
 
-/* TODO: Make a function from a macro. */
-/* Used cells are listed in the used_cell list */
-#define REMEMBER_USED_CELL\
-	do {\
-		CHECK_ERROR(curr_uc_ptr, 'p', game_ptr, MEMORY_ALLOC_ERR);\
-		curr_uc_ptr->row = row;\
-		curr_uc_ptr->col = col;\
-		new_uc_ptr = calloc(1, sizeof(struct used_cell));\
-		CHECK_ERROR(new_uc_ptr, 'p',game_ptr , MEMORY_ALLOC_ERR);\
-		new_uc_ptr->next = NULL;\
-		curr_uc_ptr->next = new_uc_ptr;\
-		curr_uc_ptr = new_uc_ptr;\
-	} while(0)
-
 /**
  * @brief Error check with cleanup.
  * @param OBJECT	Object to check (pointer or int).
@@ -61,25 +47,34 @@ static struct game *init_game();
 static void destroy_game(struct game *game_ptr);
 static int input_processing(char *buff, size_t buff_size, int *row, int *col, char *nickname);
 static void clean_output(int rows);
+static struct used_cell *remember_used_cell(struct used_cell *curr_uc_ptr, int row, int col);
 
 int main(int argc, char **argv)
 {
 	char buff[64];
 	int row, col, res_input;
-	struct used_cell *new_uc_ptr = NULL, *curr_uc_ptr = NULL;
+	struct used_cell *curr_uc_ptr = NULL;
+	struct player *curr_player = NULL;
 
 	struct game *game_ptr = init_game();
 	CHECK_ERROR(game_ptr, 'p', game_ptr,  MEMORY_ALLOC_ERR);
-	curr_uc_ptr = game_ptr->used_cell_head;
 
-	/* TODO: Completing the cycle */
+	curr_uc_ptr = game_ptr->used_cell_head;
+	curr_player = game_ptr->player_1;
+
+	/* TODO: Completing the cycle, control of used cells */
 	while(game_ptr->game_is_not_over) {
 		print_game_field(game_ptr);
-		res_input = input_processing(buff, sizeof(buff), &row, &col, game_ptr->player_1->nickname);
-		CHECK_ERROR(res_input, 'i', game_ptr, INPUT_ERR);
-		REMEMBER_USED_CELL;
 
-		game_ptr->field[row][col] = game_ptr->player_1->mark;
+		res_input = input_processing(buff, sizeof(buff), &row, &col, curr_player->nickname);
+		CHECK_ERROR(res_input, 'i', game_ptr, INPUT_ERR);
+
+		curr_uc_ptr = remember_used_cell(curr_uc_ptr, row, col);
+		CHECK_ERROR(curr_uc_ptr, 'p', game_ptr, MEMORY_ALLOC_ERR);
+
+		game_ptr->field[row][col] = curr_player->mark;
+		curr_player = (curr_player == game_ptr->player_1) ? game_ptr->player_2 : game_ptr->player_1;
+
 		clean_output(NUM_OF_LINES);
 	}
 
@@ -249,3 +244,36 @@ static void clean_output(int rows)
 	}
 	fflush(stdout);
 }
+
+/**
+ * @brief Fills current cell and appends a new one to the used cell list.
+ *
+ * Stores row and col in curr_uc_ptr, allocates a new node, links it, and returns the new node.
+ * Returns NULL on allocation failure or if curr_uc_ptr is NULL.
+ *
+ * @param curr_uc_ptr Pointer to current used cell (must be valid).
+ * @param row         Row index to record.
+ * @param col         Column index to record.
+ * @return            Pointer to new node, or NULL on error.
+ */
+static struct used_cell *remember_used_cell(struct used_cell *curr_uc_ptr, int row, int col)
+{
+	struct used_cell *new_uc_ptr = NULL;
+
+	if(!curr_uc_ptr) {
+		return NULL;
+	}
+
+	curr_uc_ptr->row = row;
+	curr_uc_ptr->col = col;
+	new_uc_ptr = calloc(1, sizeof(struct used_cell));
+	if(!new_uc_ptr) {
+		return NULL;
+	}
+
+	new_uc_ptr->next = NULL;
+	curr_uc_ptr->next = new_uc_ptr;
+
+	return new_uc_ptr;
+}
+
