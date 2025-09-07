@@ -11,21 +11,19 @@
 #include "structs.h"
 
 /* The number of lines that the program's stdout occupies */
-#define NUM_OF_LINES	7
+#define NUM_OF_LINES	11
 
 /**
  * @brief Error check with cleanup.
- * @param OBJECT	Object to check (pointer or int).
- * @param TYPE		'p' for pointer (non-NULL expected), 'i' for int (0 expected).
+ * @param OBJECT	Object to check.
  * @param GAME		Game structure to destroy on error. May be NULL.
  * @param ERROR		Return value on error.
  * 
  * Calls destroy_game(GAME) and returns ERROR if check fails.
  */
-#define CHECK_ERROR(OBJECT, TYPE, GAME, ERROR)\
+#define CHECK_POINTER(OBJECT, GAME, ERROR)\
 	do {\
-		if((TYPE == 'p' && !(OBJECT)) ||\
-		   (TYPE == 'i' && (OBJECT))) {\
+		if(!(OBJECT)){\
 			destroy_game(GAME);\
 			return ERROR;\
 		}\
@@ -57,20 +55,23 @@ int main(int argc, char **argv)
 	struct player *curr_player = NULL;
 
 	struct game *game_ptr = init_game();
-	CHECK_ERROR(game_ptr, 'p', game_ptr,  MEMORY_ALLOC_ERR);
+	CHECK_POINTER(game_ptr, game_ptr,  MEMORY_ALLOC_ERR);
 
 	curr_uc_ptr = game_ptr->used_cell_head;
 	curr_player = game_ptr->player_1;
 
-	/* TODO: Completing the cycle, control of used cells */
+	/* TODO: Completing the cycle */
 	while(game_ptr->game_is_not_over) {
 		print_game_field(game_ptr);
 
 		res_input = input_processing(buff, sizeof(buff), &row, &col, curr_player->nickname);
-		CHECK_ERROR(res_input, 'i', game_ptr, INPUT_ERR);
+		if(res_input || game_ptr->field[row][col] != '_') {
+			clean_output(NUM_OF_LINES);
+			continue;
+		}
 
 		curr_uc_ptr = remember_used_cell(curr_uc_ptr, row, col);
-		CHECK_ERROR(curr_uc_ptr, 'p', game_ptr, MEMORY_ALLOC_ERR);
+		CHECK_POINTER(curr_uc_ptr, game_ptr, MEMORY_ALLOC_ERR);
 
 		game_ptr->field[row][col] = curr_player->mark;
 		curr_player = (curr_player == game_ptr->player_1) ? game_ptr->player_2 : game_ptr->player_1;
@@ -89,11 +90,15 @@ int main(int argc, char **argv)
  */
 static void print_game_field(struct game *game_ptr)
 {
-	printf("    0   1   2\n");
-	printf("   ___ ___ ___\n");
-	printf("0 |_%c_|_%c_|_%c_|\n", game_ptr->field[0][0], game_ptr->field[0][1], game_ptr->field[0][2]);
-	printf("1 |_%c_|_%c_|_%c_|\n", game_ptr->field[1][0], game_ptr->field[1][1], game_ptr->field[1][2]);
-	printf("2 |_%c_|_%c_|_%c_|\n", game_ptr->field[2][0], game_ptr->field[2][1], game_ptr->field[2][2]);
+	/* TODO: Replace Manual*/
+	printf(" _____________________________\n");
+	printf("| Manual                      |\n");
+	printf("|_____________________________|\n\n");
+	printf("\t    0   1   2\n");
+	printf("\t   ___ ___ ___\n");
+	printf("\t0 |_%c_|_%c_|_%c_|\n", game_ptr->field[0][0], game_ptr->field[0][1], game_ptr->field[0][2]);
+	printf("\t1 |_%c_|_%c_|_%c_|\n", game_ptr->field[1][0], game_ptr->field[1][1], game_ptr->field[1][2]);
+	printf("\t2 |_%c_|_%c_|_%c_|\n", game_ptr->field[2][0], game_ptr->field[2][1], game_ptr->field[2][2]);
 	putchar('\n');
 }
 
@@ -206,7 +211,7 @@ static int input_processing(char *buff, size_t buff_size, int *row, int *col, ch
 	int res_sscanf;
 	char *res_fgets, trash;
 
-	printf("%s: ", nickname ? nickname : "Unknown");
+	printf("> %s: ", nickname ? nickname : "Unknown");
 	res_fgets = fgets(buff, buff_size, stdin);
 	if(!res_fgets) {
 		return 1;
