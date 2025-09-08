@@ -6,6 +6,7 @@
 
 /* Includes */
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "structs.h"
 #include "func.h"
@@ -42,8 +43,11 @@ int main(int argc, char **argv)
 	int row, col, res_input;
 	struct used_cell *curr_uc_ptr = NULL;
 	struct player *curr_player = NULL;
+	struct game *game_ptr = NULL;
 
-	struct game *game_ptr = init_game();
+create_game:
+
+	game_ptr = init_game();
 	CHECK_POINTER(game_ptr, game_ptr,  MEMORY_ALLOC_ERR);
 
 	curr_uc_ptr = game_ptr->used_cell_head;
@@ -54,18 +58,35 @@ int main(int argc, char **argv)
 		print_game_field(game_ptr);
 
 		res_input = input_processing(buff, sizeof(buff), &row, &col, curr_player->nickname);
-		if(res_input || game_ptr->field[row][col] != '_') {
-			clean_output(NUM_OF_LINES);
-			continue;
+		switch(res_input) {
+			case COORDINATES:
+				if(game_ptr->field[row][col] != '_') {
+					clean_output(NUM_OF_LINES);
+					continue;
+				}
+
+				curr_uc_ptr = remember_used_cell(curr_uc_ptr, row, col);
+				CHECK_POINTER(curr_uc_ptr, game_ptr, MEMORY_ALLOC_ERR);
+
+				game_ptr->field[row][col] = curr_player->mark;
+				curr_player = (curr_player == game_ptr->player_1) ? game_ptr->player_2 : game_ptr->player_1;
+
+				clean_output(NUM_OF_LINES);
+				break;
+			case ERROR: 
+				clean_output(NUM_OF_LINES);
+				continue;
+			case QUIT: 
+				return SUCCESS;
+			case RESTART:
+				destroy_game(game_ptr);
+				clean_output(NUM_OF_LINES);
+				goto create_game;
+			case RENAME:
+				handle_rename(curr_player);
+				break;
 		}
 
-		curr_uc_ptr = remember_used_cell(curr_uc_ptr, row, col);
-		CHECK_POINTER(curr_uc_ptr, game_ptr, MEMORY_ALLOC_ERR);
-
-		game_ptr->field[row][col] = curr_player->mark;
-		curr_player = (curr_player == game_ptr->player_1) ? game_ptr->player_2 : game_ptr->player_1;
-
-		clean_output(NUM_OF_LINES);
 	}
 
 	destroy_game(game_ptr);

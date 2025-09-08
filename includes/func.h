@@ -9,7 +9,28 @@
 #ifndef FUNC_H_SENTRY
 #define FUNC_H_SENTRY
 
-/* Includes */
+/* ========================================================================== */
+/*                                Enums                                       */
+/* ========================================================================== */
+
+/* @brief Represents the result of user input processing.
+ *
+ * Used by input_processing() to indicate whether the user entered:
+ * - Game coordinates (COORDINATES),
+ * - A control command (QUIT, RENAME, RESTART),
+ * - Or invalid/unreadable input (ERROR).
+ */
+typedef enum {
+	COORDINATES,
+	ERROR,
+	QUIT			= 'q',
+	RENAME			= 'n',
+	RESTART			= 'r'
+} input_data;
+
+/* ========================================================================== */
+/*                                Includes                                    */
+/* ========================================================================== */
 #include "structs.h"
 
 /* ========================================================================== */
@@ -17,7 +38,7 @@
 /* ========================================================================== */
 
 /* The number of lines that the program's stdout occupies */
-#define NUM_OF_LINES	11
+#define NUM_OF_LINES		20
 
 /* ========================================================================== */
 /*                                Headers                                     */
@@ -47,19 +68,18 @@ struct game *init_game();
 void destroy_game(struct game *game_ptr);
 
 /**
- * @brief Processes data received on stdin.
+ * @brief Reads and parses user input: either coordinates (row col) or a single-letter command.
+ *        On success with coordinates, writes them to `row` and `col`.
+ *        On command input ('q', 'n', 'r'), returns corresponding enum value.
+ *        If input is invalid or unreadable, returns ERROR.
  *
- * Calls fgets, then parses the resulting data using sscanf. 
- * Expects two numbers in the range [0,2] (row, column).
- *
- * @param buff		The buffer into which the line from stdin is written.
- * @param buff_size	Size of buffer from first parameter. 
- * @param row		Pointer to which the line number will be written upon successful input.
- * @param col		Pointer to which the column number will be written upon successful input.
- * @param nickname 	Nickname of the player from whom the input is received.
- * @return 0 if success, 1 if error fgets, 2 if error sscanf. 
+ * @return COORDINATES — valid row/col parsed.
+ *         ERROR       — failed to read or parse input.
+ *         QUIT        — user typed 'q'.
+ *         RENAME      — user typed 'n'.
+ *         RESTART     — user typed 'r'.
  */
-int input_processing(char *buff, size_t buff_size, int *row, int *col, char *nickname);
+input_data input_processing(char *buff, size_t buff_size, int *row, int *col, const char *nickname);
 
 /**
  * @brief Clears the previous N lines in the terminal.
@@ -87,4 +107,16 @@ void clean_output(int rows);
  * @return            Pointer to new node, or NULL on error.
  */
 struct used_cell *remember_used_cell(struct used_cell *curr_uc_ptr, int row, int col);
-#endif
+
+/**
+ * @brief Prompts the user to enter a new nickname and updates the player's name.
+ *
+ * Reads input from stdin, trims the trailing newline, and safely copies
+ * the result into the player's nickname field. Cleans console after input.
+ * Does nothing if fgets fails.
+ *
+ * @param curr_player Pointer to the player structure to update (must not be NULL).
+ */
+void handle_rename(struct player *curr_player);
+
+#endif /* FUNC_H_SENTRY */

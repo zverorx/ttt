@@ -42,7 +42,7 @@ $(TARGET): $(OBJECTS)
 	$(CC) $(CFLAGS) $^ -o $@ 
 
 # Compile .c files into .o files
-$(SRCDIR)/%.o: $(SRCDIR)/%.c
+$(SRCDIR)/%.o: $(SRCDIR)/%.c $(INCDIR)/structs.h $(INCDIR)/func.h
 	@echo "Compiling $<"
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 

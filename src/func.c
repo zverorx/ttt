@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include "structs.h"
+#include "func.h"
 
 /**
  * @brief Print game field to stdout.
@@ -20,9 +21,17 @@
  */
 void print_game_field(struct game *game_ptr)
 {
-	/* TODO: Replace Manual*/
 	printf(" _____________________________\n");
-	printf("| Manual                      |\n");
+	printf("|         Tic Tac Toe         |\n");
+	printf("| To move, enter the row and  |\n");
+	printf("| column separated by a space.|\n");
+	printf("|                             |\n");
+	printf("| Commands:                   |\n");
+	printf("| q - exit                    |\n");
+	printf("| r - restart                 |\n");
+	printf("| n - rename                  |\n");
+	printf("|                             |\n");
+	printf("| Enjoy the game!             |\n");
 	printf("|_____________________________|\n\n");
 	printf("\t    0   1   2\n");
 	printf("\t   ___ ___ ___\n");
@@ -122,39 +131,48 @@ void destroy_game(struct game *game_ptr)
 
 	return;
 }
-
 /**
- * @brief Processes data received on stdin.
+ * @brief Reads and parses user input: either coordinates (row col) or a single-letter command.
+ *        On success with coordinates, writes them to `row` and `col`.
+ *        On command input ('q', 'n', 'r'), returns corresponding enum value.
+ *        If input is invalid or unreadable, returns ERROR.
  *
- * Calls fgets, then parses the resulting data using sscanf. 
- * Expects two numbers in the range [0,2] (row, column).
- *
- * @param buff		The buffer into which the line from stdin is written.
- * @param buff_size	Size of buffer from first parameter. 
- * @param row		Pointer to which the line number will be written upon successful input.
- * @param col		Pointer to which the column number will be written upon successful input.
- * @param nickname 	Nickname of the player from whom the input is received.
- * @return 0 if success, 1 if error fgets, 2 if error sscanf. 
+ * @return COORDINATES — valid row/col parsed.
+ *         ERROR       — failed to read or parse input.
+ *         QUIT        — user typed 'q'.
+ *         RENAME      — user typed 'n'.
+ *         RESTART     — user typed 'r'.
  */
-int input_processing(char *buff, size_t buff_size, int *row, int *col, char *nickname)
+input_data input_processing(char *buff, size_t buff_size, int *row, int *col, const char *nickname)
 {
 	int res_sscanf;
-	char *res_fgets, trash;
+	char *res_fgets, trash, cmd;
 
 	printf("> %s: ", nickname ? nickname : "Unknown");
 	res_fgets = fgets(buff, buff_size, stdin);
 	if(!res_fgets) {
-		return 1;
+		return ERROR;
 	}
 
 	res_sscanf = sscanf(buff, "%d %d %c", row, col, &trash);
-	if (res_sscanf != 2 ||
+	if(res_sscanf != 2 ||
 		*(row) < 0 || *(row) >= MAX_ROW ||
 		*(col) < 0 || *(col) >= MAX_COLUMN) {
-		return 2;
+
+		res_sscanf = sscanf(buff, "%c %c", &cmd, &trash);
+		if(res_sscanf != 1) {
+			return ERROR;
+		}
+
+		switch(cmd) {
+			case 'q': return QUIT;
+			case 'n': return RENAME;
+			case 'r': return RESTART;
+			default: return ERROR;
+		}
 	}
 
-	return 0;
+	return COORDINATES;
 }
 
 /**
@@ -210,4 +228,35 @@ struct used_cell *remember_used_cell(struct used_cell *curr_uc_ptr, int row, int
 	curr_uc_ptr->next = new_uc_ptr;
 
 	return new_uc_ptr;
+}
+
+/**
+ * @brief Prompts the user to enter a new nickname and updates the player's name.
+ *
+ * Reads input from stdin, trims the trailing newline, and safely copies
+ * the result into the player's nickname field. Cleans console after input.
+ * Does nothing if fgets fails.
+ *
+ * @param curr_player Pointer to the player structure to update (must not be NULL).
+ */
+void handle_rename(struct player *curr_player)
+{
+	char buff[64], *res_fgets;
+	
+	printf("\r\033[A\033[2K");
+	fputs("> ", stdout);
+	res_fgets = fgets(buff, sizeof(buff), stdin);
+	if(!res_fgets) {
+		clean_output(NUM_OF_LINES);
+		return;
+	}
+	for(int i = 0; i < sizeof(buff); i++) {
+		if(buff[i] == '\n') {
+			buff[i] = '\0';
+			break;
+		}
+	}
+	snprintf(curr_player->nickname, sizeof(curr_player->nickname), "%s", buff);
+	clean_output(NUM_OF_LINES);
+	return;
 }
