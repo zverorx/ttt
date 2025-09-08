@@ -8,7 +8,6 @@
  * - Linked list node for tracking used cells
  * - Constants for board dimensions.
  *
- * @note This header should be included only once via include guards.
  * @author Zveror
  * @date September 2025
  */
