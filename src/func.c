@@ -15,6 +15,169 @@
 #include "func.h"
 
 /**
+ * @brief Handles a player's move on the game board.
+ *
+ * Places the current player's mark if the cell is empty.
+ * Records the move, checks for win/draw, and switches player.
+ * Exits on memory allocation failure.
+ *
+ * @param game_ptr      Pointer to the game state (must not be NULL).
+ * @param curr_uc_ptr   Pointer to the current used cell pointer (updated after move).
+ * @param curr_player   Pointer to the current player pointer (switched after move).
+ * @param row           Target row (0-based).
+ * @param col           Target column (0-based).
+ */
+void handle_move(struct game *game_ptr, 
+				 struct used_cell **curr_uc_ptr, 
+				 struct player **curr_player, int row, int col) {
+	int res_game_over;
+
+	if(game_ptr->field[row][col] != '_') {
+		clean_output(NUM_OF_LINES);
+		return;
+	}
+	*curr_uc_ptr = remember_used_cell(*curr_uc_ptr, row, col);
+	if(!*curr_uc_ptr){
+		destroy_game(game_ptr);
+		exit(MEMORY_ALLOC_ERR);
+	}
+
+	game_ptr->field[row][col] = (*curr_player)->mark;
+
+	res_game_over = check_game_over(game_ptr, *curr_player);
+	switch(res_game_over) {
+		case RGO_WIN:
+			game_ptr->game_is_not_over = 0;
+			clean_output(NUM_OF_LINES);
+			print_game_field(game_ptr);
+			print_game_over(RGO_WIN, *curr_player);
+			return;
+		case RGO_DRAW:
+			game_ptr->game_is_not_over = 0;
+			clean_output(NUM_OF_LINES);
+			print_game_field(game_ptr);
+			print_game_over(RGO_DRAW, *curr_player);
+			return;
+	}
+	*curr_player = (*curr_player == game_ptr->player_1) ? game_ptr->player_2 : game_ptr->player_1;
+	clean_output(NUM_OF_LINES);
+	return;
+}
+
+/**
+ * @brief Checks if the current player has won or if the game is a draw.
+ *
+ * Scans rows, columns, and diagonals for 3 matching marks.
+ * Also checks if any free cells remain to determine a draw.
+ *
+ * @param game_ptr      Pointer to the game state (must not be NULL).
+ * @param curr_player   Pointer to the current player (must not be NULL).
+ *
+ * @return RGO_WIN if current player won, RGO_DRAW if no moves left, 0 otherwise.
+ */
+ret_game_over check_game_over(struct game *game_ptr, struct player *curr_player)
+{
+	int count, has_free_cells = 0;
+	char mark = curr_player->mark;
+
+	if(!game_ptr || !curr_player) {
+		return RGO_ERROR;
+	}
+
+	/* Check by rows */
+	for(int i = 0; i < MAX_ROW; i++) {
+		count = 0;
+		for(int j = 0; j < MAX_COLUMN; j++) {
+			if(game_ptr->field[i][j] == mark) {
+				count++;
+			}
+			if(count == 3) {
+				goto winner;
+			}
+			if(game_ptr->field[i][j] == '_') {
+				has_free_cells = 1;
+			} 
+		}
+	}
+
+	/* Check by columns */
+	for(int j = 0; j < MAX_ROW; j++) {
+		count = 0;
+		for(int i = 0; i < MAX_COLUMN; i++) {
+			if(game_ptr->field[i][j] == mark) {
+				count++;
+			}
+			if(count == 3) {
+				goto winner;
+			}
+			if(game_ptr->field[i][j] == '_') {
+				has_free_cells = 1;
+			} 
+		}
+	}
+
+	/* Main diagonal */
+	count = 0;
+	for(int i = 0; i < MAX_ROW; i++) {
+		if(game_ptr->field[i][i] == mark) {
+			count++;
+		}
+		if(count == 3) {
+			goto winner;
+		}
+		if(game_ptr->field[i][i] == '_') {
+			has_free_cells = 1;
+		} 
+	}
+
+	/* Secondary diagonal */
+	count = 0;
+	for(int i = 0; i < MAX_ROW; i++) {
+		if(game_ptr->field[i][2 - i] == mark) {
+			count++;
+		}
+		if(count == 3) {
+			goto winner;
+		}
+		if(game_ptr->field[i][2 - i] == '_') {
+			has_free_cells = 1;
+		} 
+	}
+
+	/* Checking a draw */
+	if(!has_free_cells) {
+		goto draw;
+	}
+
+	return 0; 
+
+winner:
+	return RGO_WIN;
+
+draw:
+	return RGO_DRAW;
+
+}
+
+/**
+ * @brief Prints the game result message (win or draw).
+ *
+ * @param status    Game result: RGO_WIN or RGO_DRAW.
+ * @param plr       Pointer to the winning player (ignored for draw).
+ */
+void print_game_over(ret_game_over status, struct player *plr) {
+	switch(status) {
+		case RGO_WIN:
+			printf("%s win!\n", plr->nickname);
+			break;
+		case RGO_DRAW:
+			printf("Draw!\n");
+			break;
+		case RGO_ERROR: break;
+	}
+}
+
+/**
  * @brief Print game field to stdout.
  * @param game_ptr Pointer to the game structure.
  * @return void.
@@ -151,7 +314,7 @@ input_data input_processing(char *buff, size_t buff_size, int *row, int *col, co
 	printf("> %s: ", nickname ? nickname : "Unknown");
 	res_fgets = fgets(buff, buff_size, stdin);
 	if(!res_fgets) {
-		return ERROR;
+		return INP_D_ERROR;
 	}
 
 	res_sscanf = sscanf(buff, "%d %d %c", row, col, &trash);
@@ -161,18 +324,18 @@ input_data input_processing(char *buff, size_t buff_size, int *row, int *col, co
 
 		res_sscanf = sscanf(buff, "%c %c", &cmd, &trash);
 		if(res_sscanf != 1) {
-			return ERROR;
+			return INP_D_ERROR;
 		}
 
 		switch(cmd) {
-			case 'q': return QUIT;
-			case 'n': return RENAME;
-			case 'r': return RESTART;
-			default: return ERROR;
+			case 'q': return INP_D_QUIT;
+			case 'n': return INP_D_RENAME;
+			case 'r': return INP_D_RESTART;
+			default: return INP_D_ERROR;
 		}
 	}
 
-	return COORDINATES;
+	return INP_D_COORDINATES;
 }
 
 /**

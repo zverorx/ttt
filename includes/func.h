@@ -13,6 +13,25 @@
 /*                                Enums                                       */
 /* ========================================================================== */
 
+/**
+ * @enum errors
+ * @brief Error codes returned by the program.
+ */
+enum errors {
+	SUCCESS				= 0, /*< No error. */
+	MEMORY_ALLOC_ERR	= 1, /*< Memory allocation error */
+	INPUT_ERR			= 2  /*< Data entry error */
+};
+
+/**
+ * @brief Return codes for game-over status.
+ */
+typedef enum {
+	RGO_ERROR		= -1,
+	RGO_WIN			= 1,
+	RGO_DRAW		= 2
+} ret_game_over;
+
 /* @brief Represents the result of user input processing.
  *
  * Used by input_processing() to indicate whether the user entered:
@@ -21,11 +40,11 @@
  * - Or invalid/unreadable input (ERROR).
  */
 typedef enum {
-	COORDINATES,
-	ERROR,
-	QUIT			= 'q',
-	RENAME			= 'n',
-	RESTART			= 'r'
+	INP_D_COORDINATES,
+	INP_D_ERROR,
+	INP_D_QUIT			= 'q',
+	INP_D_RENAME		= 'n',
+	INP_D_RESTART		= 'r'
 } input_data;
 
 /* ========================================================================== */
@@ -43,6 +62,44 @@ typedef enum {
 /* ========================================================================== */
 /*                                Headers                                     */
 /* ========================================================================== */
+
+/**
+ * @brief Prints the game result message (win or draw).
+ *
+ * @param status    Game result: RGO_WIN or RGO_DRAW.
+ * @param plr       Pointer to the winning player (ignored for draw).
+ */
+void print_game_over(ret_game_over status, struct player *plr);
+
+/**
+ * @brief Checks if the current player has won or if the game is a draw.
+ *
+ * Scans rows, columns, and diagonals for 3 matching marks.
+ * Also checks if any free cells remain to determine a draw.
+ *
+ * @param game_ptr      Pointer to the game state (must not be NULL).
+ * @param curr_player   Pointer to the current player (must not be NULL).
+ *
+ * @return RGO_WIN if current player won, RGO_DRAW if no moves left, 0 otherwise.
+ */
+ret_game_over check_game_over(struct game *game_ptr, struct player *curr_player);
+
+/**
+ * @brief Handles a player's move on the game board.
+ *
+ * Places the current player's mark if the cell is empty.
+ * Records the move, checks for win/draw, and switches player.
+ * Exits on memory allocation failure.
+ *
+ * @param game_ptr      Pointer to the game state (must not be NULL).
+ * @param curr_uc_ptr   Pointer to the current used cell pointer (updated after move).
+ * @param curr_player   Pointer to the current player pointer (switched after move).
+ * @param row           Target row (0-based).
+ * @param col           Target column (0-based).
+ */
+void handle_move(struct game *game_ptr, 
+				 struct used_cell **curr_uc_ptr, 
+				 struct player **curr_player, int row, int col);
 
 /**
  * @brief Print game field to stdout.

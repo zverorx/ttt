@@ -27,16 +27,6 @@
 		}\
 	} while(0)
 
-/**
- * @enum errors
- * @brief Error codes returned by the program.
- */
-enum errors {
-	SUCCESS				= 0, /*< No error. */
-	MEMORY_ALLOC_ERR	= 1, /*< Memory allocation error */
-	INPUT_ERR			= 2  /*< Data entry error */
-};
-
 int main(int argc, char **argv)
 {
 	char buff[64];
@@ -53,40 +43,29 @@ create_game:
 	curr_uc_ptr = game_ptr->used_cell_head;
 	curr_player = game_ptr->player_1;
 
-	/* TODO: Completing the cycle */
 	while(game_ptr->game_is_not_over) {
 		print_game_field(game_ptr);
 
 		res_input = input_processing(buff, sizeof(buff), &row, &col, curr_player->nickname);
 		switch(res_input) {
-			case COORDINATES:
-				if(game_ptr->field[row][col] != '_') {
-					clean_output(NUM_OF_LINES);
-					continue;
-				}
-
-				curr_uc_ptr = remember_used_cell(curr_uc_ptr, row, col);
-				CHECK_POINTER(curr_uc_ptr, game_ptr, MEMORY_ALLOC_ERR);
-
-				game_ptr->field[row][col] = curr_player->mark;
-				curr_player = (curr_player == game_ptr->player_1) ? game_ptr->player_2 : game_ptr->player_1;
-
-				clean_output(NUM_OF_LINES);
+			case INP_D_COORDINATES:
+				handle_move(game_ptr, &curr_uc_ptr, &curr_player, row, col);
 				break;
-			case ERROR: 
+			case INP_D_ERROR: 
 				clean_output(NUM_OF_LINES);
 				continue;
-			case QUIT: 
+			case INP_D_QUIT: 
 				return SUCCESS;
-			case RESTART:
+			case INP_D_RESTART:
 				destroy_game(game_ptr);
+				curr_uc_ptr = NULL;
+				curr_player = NULL;
 				clean_output(NUM_OF_LINES);
 				goto create_game;
-			case RENAME:
+			case INP_D_RENAME:
 				handle_rename(curr_player);
 				break;
 		}
-
 	}
 
 	destroy_game(game_ptr);
