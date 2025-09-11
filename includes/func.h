@@ -1,8 +1,8 @@
 /**
  * @file func.h
- * @brief Constants and function headers for the game tic-tac-toe.
+ * @brief Function headers for the game tic-tac-toe.
  * 
- * @author Zveror
+ * @author zveror
  * @data September 2025
  */
 
@@ -10,66 +10,14 @@
 #define FUNC_H_SENTRY
 
 /* ========================================================================== */
-/*                                Enums                                       */
-/* ========================================================================== */
-
-/**
- * @enum errors
- * @brief Error codes returned by the program.
- */
-enum errors {
-	SUCCESS				= 0, /*< No error. */
-	MEMORY_ALLOC_ERR	= 1, /*< Memory allocation error */
-	INPUT_ERR			= 2  /*< Data entry error */
-};
-
-/**
- * @brief Return codes for game-over status.
- */
-typedef enum {
-	RGO_ERROR		= -1,
-	RGO_WIN			= 1,
-	RGO_DRAW		= 2
-} ret_game_over;
-
-/* @brief Represents the result of user input processing.
- *
- * Used by input_processing() to indicate whether the user entered:
- * - Game coordinates (COORDINATES),
- * - A control command (QUIT, RENAME, RESTART),
- * - Or invalid/unreadable input (ERROR).
- */
-typedef enum {
-	INP_D_COORDINATES,
-	INP_D_ERROR,
-	INP_D_QUIT			= 'q',
-	INP_D_RENAME		= 'n',
-	INP_D_RESTART		= 'r'
-} input_data;
-
-/* ========================================================================== */
 /*                                Includes                                    */
 /* ========================================================================== */
-#include "structs.h"
 
-/* ========================================================================== */
-/*                                Constants                                   */
-/* ========================================================================== */
-
-/* The number of lines that the program's stdout occupies */
-#define NUM_OF_LINES		20
+#include "types.h"
 
 /* ========================================================================== */
 /*                                Headers                                     */
 /* ========================================================================== */
-
-/**
- * @brief Prints the game result message (win or draw).
- *
- * @param status    Game result: RGO_WIN or RGO_DRAW.
- * @param plr       Pointer to the winning player (ignored for draw).
- */
-void print_game_over(ret_game_over status, struct player *plr);
 
 /**
  * @brief Checks if the current player has won or if the game is a draw.
@@ -102,13 +50,6 @@ void handle_move(struct game *game_ptr,
 				 struct player **curr_player, int row, int col);
 
 /**
- * @brief Print game field to stdout.
- * @param game_ptr Pointer to the game structure.
- * @return void.
- */
-void print_game_field(struct game *game_ptr);
-
-/**
  * @brief Initializes a new game instance with default settings.
  *
  * Allocates and initializes the main game structure, two players,
@@ -137,20 +78,6 @@ void destroy_game(struct game *game_ptr);
  *         RESTART     — user typed 'r'.
  */
 input_data input_processing(char *buff, size_t buff_size, int *row, int *col, const char *nickname);
-
-/**
- * @brief Clears the previous N lines in the terminal.
- *
- * Moves the cursor up line by line, starting from the current position,
- * and erases each line's content using ANSI escape sequences.
- * 
- * @param rows Number of lines to clear in terminal.
- * @note This function uses ANSI escape codes:
- *       \r      – Carriage return (to start of line)
- *       \033[2K – Clear entire line
- *       \033[A  – Move cursor up one line
- */
-void clean_output(int rows);
 
 /**
  * @brief Fills current cell and appends a new one to the used cell list.

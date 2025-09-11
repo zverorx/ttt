@@ -1,6 +1,6 @@
 /**
- * @file structs.h
- * @brief Game data structures and constants for Tic-Tac-Toe implementation.
+ * @file types.h
+ * @brief Game data structures, constants and enums for Tic-Tac-Toe implementation.
  *
  * Defines the core data structures used in the game:
  * - Game state (board, players, control flags)
@@ -8,12 +8,16 @@
  * - Linked list node for tracking used cells
  * - Constants for board dimensions.
  *
- * @author Zveror
+ * @author zveror
  * @date September 2025
  */
 
 #ifndef STRUCTS_H_SENTRY
 #define STRUCTS_H_SENTRY
+
+/* ========================================================================== */
+/*                                Includes                                    */
+/* ========================================================================== */
 
 #include <stdint.h>
 
@@ -34,6 +38,52 @@
  * @note Currently set to 3 for a standard 3x3 Tic-Tac-Toe board.
  */
 #define MAX_COLUMN  3
+
+/**
+ * @def NUM_OF_LINES
+ * @brief The number of lines that the program's stdout occupies.
+ * @note Used when clearing output as a parameter to clean_output(int rows).
+ *
+ */ 
+#define NUM_OF_LINES		20
+
+/* ========================================================================== */
+/*                                Enums                                       */
+/* ========================================================================== */
+
+/**
+ * @enum errors
+ * @brief Error codes returned by the program.
+ */
+enum errors {
+	SUCCESS				= 0, /*< No error. */
+	MEMORY_ALLOC_ERR	= 1, /*< Memory allocation error */
+	INPUT_ERR			= 2  /*< Data entry error */
+};
+
+/**
+ * @brief Return codes for game-over status.
+ */
+typedef enum {
+	RGO_ERROR		= -1,
+	RGO_WIN			= 1,
+	RGO_DRAW		= 2
+} ret_game_over;
+
+/* @brief Represents the result of user input processing.
+ *
+ * Used by input_processing() to indicate whether the user entered:
+ * - Game coordinates (COORDINATES),
+ * - A control command (QUIT, RENAME, RESTART),
+ * - Or invalid/unreadable input (ERROR).
+ */
+typedef enum {
+	INP_D_COORDINATES,
+	INP_D_ERROR,
+	INP_D_QUIT			= 'q',
+	INP_D_RENAME		= 'n',
+	INP_D_RESTART		= 'r'
+} input_data;
 
 /* ========================================================================== */
 /*                                Structures                                  */

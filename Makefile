@@ -14,7 +14,7 @@ SRCDIR = src
 INCDIR = includes
 
 # List of source files
-SOURCES = $(SRCDIR)/main.c $(SRCDIR)/func.c
+SOURCES = $(SRCDIR)/main.c $(SRCDIR)/func.c $(SRCDIR)/ui.c
 
 # List of objects files
 OBJECTS = $(SOURCES:.c=.o)

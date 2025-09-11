@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @author Zveror
+ * @author zveror
  * @data September 2025
  */
 
@@ -8,8 +8,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "structs.h"
+#include "types.h"
 #include "func.h"
+#include "ui.h"
 
 /**
  * @brief Error check with cleanup.
