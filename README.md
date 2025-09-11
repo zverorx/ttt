@@ -5,16 +5,18 @@ Tic Tac Toe for two players in the terminal.
 Check for the following programs:
 * gcc
 * make
-* git
+* curl
+* unzip
 
 ## Receiving the project
-You can get the source code by cloning the repository using the command:
+The source code can be obtained using the commands:
 ```
-git clone https://github.com/zverorx/ttt.git
+curl -L -o ttt-v1.0.0.zip https://github.com/zverorx/ttt/archive/refs/tags/v1.0.0.zip
+unzip ttt-v1.0.0.zip
 ```
 
 ## Compilation and installation
- To install the program, run the following commands in the terminal window:
+Go to the source directory (see Receiving the project), and run the following commands:
 ```
 make
 sudo make install
