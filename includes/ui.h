@@ -2,7 +2,7 @@
  * @file ui.h
  * @brief Function headers for user interface.
  *
- * @author zveror
+ * @author zverorx
  * @data September
  */
 

@@ -8,7 +8,7 @@
  * - Linked list node for tracking used cells
  * - Constants for board dimensions.
  *
- * @author zveror
+ * @author zverorx
  * @date September 2025
  */
 

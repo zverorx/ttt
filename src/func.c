@@ -2,7 +2,7 @@
  * @file func.c
  * @brief Contains function definitions for main.c.
  *
- * @author zveror
+ * @author zverorx
  * @data September 2025
  */
 

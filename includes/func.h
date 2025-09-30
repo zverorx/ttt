@@ -2,7 +2,7 @@
  * @file func.h
  * @brief Function headers for the game tic-tac-toe.
  * 
- * @author zveror
+ * @author zverorx
  * @data September 2025
  */
 

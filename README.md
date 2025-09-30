@@ -1,5 +1,7 @@
 # ttt
-Tic Tac Toe for two players in the terminal.
+Tic Tac Toe for two players in the terminal
+
+---
 
 ## Prerequisites
 Check for the following programs:

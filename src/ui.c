@@ -4,7 +4,7 @@
  *
  * Functions are responsible for the user interface.
  *
- * @author zveror
+ * @author zverorx
  * @data September 2025
  */
 

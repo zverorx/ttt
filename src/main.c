@@ -1,6 +1,6 @@
 /**
  * @file main.c
- * @author zveror
+ * @author zverorx
  * @data September 2025
  */
 
