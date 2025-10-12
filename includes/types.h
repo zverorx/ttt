@@ -113,11 +113,11 @@ typedef enum {
  * This structure is used to form a linked list of all moves made during the game.
  * The list starts at game->used_cell_head and grows with each move.
  *
- * @var used_cell::row
+ * @var used_cell.row
  *      Row index of the used cell (0-based).
- * @var used_cell::col
+ * @var used_cell.col
  *      Column index of the used cell (0-based).
- * @var used_cell::next
+ * @var used_cell.next
  *      Pointer to the next used cell in the list, or NULL if last.
  */
 struct used_cell {
@@ -132,9 +132,9 @@ struct used_cell {
  *
  * Contains player-specific data such as nickname and assigned mark ('X' or 'O').
  *
- * @var player::nickname
+ * @var player.nickname
  *      Player's name, used for prompts and display (max 63 chars + null terminator).
- * @var player::mark
+ * @var player.mark
  *      Symbol used by the player on the board: typically 'X' or 'O'.
  */
 struct player {
