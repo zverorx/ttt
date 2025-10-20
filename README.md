@@ -5,10 +5,10 @@ Tic Tac Toe for two players in the terminal
 
 ## Prerequisites
 Check for the following programs:
-* gcc
-* make
-* curl
-* unzip
+* `gcc`
+* `make`
+* `curl`
+* `unzip`
 
 ## Receiving the project
 The source code can be obtained using the commands:
@@ -20,12 +20,7 @@ unzip ttt-v1.0.0.zip
 ## Compilation and installation
 Go to the source directory (see Receiving the project), and run the following commands:
 ```
-make
-sudo make install
-```
-To change the installation path, use the CONFIG_PREFIX variable:
-```
-sudo make CONFIG_PREFIX=/home/user install
+make && sudo make install
 ```
 
 To find out more about Makefile features, run 
@@ -64,7 +59,7 @@ You will see some information about the game, a playing field and an invitation 
 Enter two numbers from 0 to 2, the first number is the row number, the second is the column number and press Enter.
 Your first move is done! Good luck in winning.
 
-Don't forget the tips at the top, type 'q' to quit, 'n' to rename yourself and 'r' to start over.
+Don't forget the tips at the top, type `q` to quit, `n` to rename yourself and `r` to start over.
 
 ## Removal
 To remove, use the command:
@@ -72,7 +67,7 @@ To remove, use the command:
 sudo make uninstall
 ```
 ## License
-This project is licensed under the GPLv3 license. See the LICENSE file for more details.
+This project is licensed under the GPLv3. See the LICENSE file for more details.
 
 ## Feedback
-To contact the developer, you can contact by email zveror1806@gmail.com
+You can contact the developer at: zveror1806@gmail.com
