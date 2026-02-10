@@ -1,39 +1,54 @@
 # ttt
+
 Tic Tac Toe for two players in the terminal
 
----
-
 ## Prerequisites
+
 Check for the following programs:
+
 * `gcc`
 * `make`
-* `curl`
-* `unzip`
 
 ## Receiving the project
-The source code can be obtained using the commands:
-```
-curl -L -o ttt-v1.0.0.zip https://github.com/zverorx/ttt/archive/refs/tags/v1.0.0.zip
-unzip ttt-v1.0.0.zip
+
+### Download the archive:
+
+```bash
+curl -L -o ttt.zip https://github.com/zverorx/ttt/archive/refs/tags/v1.zip
 ```
 
-## Compilation and installation
-Go to the source directory (see Receiving the project), and run the following commands:
-```
-make && sudo make install
+```bash
+unzip ttt.zip
 ```
 
-To find out more about Makefile features, run 
+### Clone a repository:
+
+```bash
+git clone https://github.com/zverorx/ttt.git
+```
+
+## Compilation
+
+Go to the source directory and run:
+
+```bash
+make
+```
+
+To find out more about Makefile features, run: 
+
 ```
 make help
 ```
 
 ## Usage
-If installation is successful, enter in the terminal line:
+
+```bash
+$ ./ttt
 ```
-ttt
-```
-You will see some information about the game, a playing field and an invitation to enter.
+
+The result of executing the command:
+
 ```
  _____________________________
 |         Tic Tac Toe         |
@@ -56,18 +71,15 @@ You will see some information about the game, a playing field and an invitation 
 
 > Player_1: 
 ```
+
 Enter two numbers from 0 to 2, the first number is the row number, the second is the column number and press Enter.
+
 Your first move is done! Good luck in winning.
 
-Don't forget the tips at the top, type `q` to quit, `n` to rename yourself and `r` to start over.
-
-## Removal
-To remove, use the command:
-```
-sudo make uninstall
-```
 ## License
+
 This project is licensed under the GPLv3. See the LICENSE file for more details.
 
 ## Feedback
-You can contact the developer at: zveror1806@gmail.com
+
+To contact the developer, you can email zveror1806@gmail.com.
