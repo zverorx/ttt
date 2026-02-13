@@ -19,56 +19,22 @@
  */
 
 #include <string.h>
-#include <stdlib.h>
 
 #include "player.h"
 
-Player::Player(char *nickname, char mark)
+Player::Player(const char *nickname, char mark)
+    : nickname()
+    , mark(mark)
 {
-    this->nickname = nickname;
-    this->mark = mark;
-}
+    if (!nickname) { throw "Bad nickname"; }
+    if ((mark < 33 || mark > 126)) { throw "Bad mark"; }
 
-Player::Player(const Player &p)
-{
-    nickname = strdup(p.nickname);
-    if (!nickname) { throw "Bad argument"; }
-
-    mark = p.mark;
-}
-
-Player::~Player()
-{
-    if (nickname) { free(nickname); }
-}
-
-void Player::operator=(const Player &p)
-{
-    if (this == &p) { return; }
-
-    if (nickname) { free(nickname); }
-
-    nickname = strdup(p.nickname);
-    if (!nickname) { throw "Bad argument"; }
-
-    mark = p.mark;
-}
-
-Player *Player::Create(const char *nickname, const char mark)
-{
-    if (!nickname) { return 0; }
-
-    if (mark < 'A' || mark > 'Z') { return 0; }
-
-    char *nickname_dup = strdup(nickname);
-    if (!nickname_dup) { return 0; }
-
-    return new Player(nickname_dup, mark);
+    strncpy(this->nickname, nickname, sizeof(this->nickname));
+    this->nickname[sizeof(this->nickname) - 1] = '\0';
 }
 
 const char *Player::GetNickname() const
 {
-    const char *nickname = this->nickname;
     return nickname;
 }
 
@@ -80,17 +46,17 @@ char Player::GetMark() const
 bool Player::SetNickname(const char *nickname)
 {
     if (!nickname) { return false; }
-    free(this->nickname);
 
-    this->nickname = strdup(nickname);
-    if (!this->nickname) { return false; }
+    memset(this->nickname, 0, sizeof(this->nickname));
+    strncpy(this->nickname, nickname, sizeof(this->nickname));
+    this->nickname[sizeof(this->nickname) - 1] = '\0';
 
     return true;
 }
 
-bool Player::SetMark(const char mark)
+bool Player::SetMark(char mark)
 {
-    if (mark < 'A' || mark > 'Z') { return false; }
+    if ((mark < 33 || mark > 126)) { return false; }
 
     this->mark = mark;
 

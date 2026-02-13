@@ -21,25 +21,29 @@
 #ifndef PLAYER_H_SENTRY
 #define PLAYER_H_SENTRY
 
+/**
+ * @class Player
+ * @brief The participant of the game. 
+ */
 class Player {
-    char *nickname;
-    char mark;
-
-    Player(char *nickname, char mark);
+private:
+    char nickname[33];
+    char mark; /* [33;126] (printable ASCII) */
 
 public:
-    Player(const Player &p);
-    ~Player();
-
-    void operator=(const Player &p);
-
-    static Player *Create(const char *nickname, const char mark);
+    /**
+     * @param nickname Must not be NULL.
+     * @param mark Any other than control characters.
+     *             Use code [33;126] (printable ASCII).
+     * 
+     * @throws const char * on invalid arguments.
+     */
+    Player(const char *nickname, char mark);
 
     const char *GetNickname() const;
     char GetMark() const;
-
     bool SetNickname(const char *nickname);
-    bool SetMark(const char mark);
+    bool SetMark(char mark);
 };
 
 #endif /* PLAYER_H_SENTRY */
