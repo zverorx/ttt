@@ -30,11 +30,15 @@
 enum field_size { row_count = 3, col_count = 3 };
 
 /**
- * @enum print_mode
- * @brief Print the active game or its finish.
- * @see ConsoleUI::PrintUI
+ * @enum panel_version
+ * @brief Available panel display modes.
+ * @var info Initial information panel.
+ * @var game_time Active game panel expecting move.
+ * @var game_time_error Game panel with input error message.
+ * @var game_over Final panel showing winner.
+ * @see Console::Print
  */
-enum print_mode { active, finish };
+enum panel_version { info, game_time, game_time_error, game_over };
 
 /**
  * @class ConsoleUI
@@ -53,11 +57,14 @@ public:
     ConsoleUI();
 
     /**
-     * @brief Prints the complete interface.
-     * @param md Display mode (active game or finished game).
-     * @param winner Pointer to the winner player (NULL for draw).
+     * @brief Prints the complete game interface.
+     * @param v Panel version to display.
+     * @param p Pointer to player (can be NULL for default message).
+     * 
+     * Combines panel, separator and field into single output.
+     * Updates output line counter.
      */
-    void PrintUI(print_mode md = active, const Player *winner = 0);
+    void Print(panel_version v, const Player *p = 0);
 
     /**
      * @brief Clears all previously printed interface lines from console.
@@ -69,7 +76,7 @@ public:
      *       \033[2K – Clear entire line
      *       \033[1A – Move cursor up one line
      */
-    void ClearUI();
+    void Clear();
 
     /**
      * @brief Checks if the cell is occupied and returns its mark.
@@ -107,23 +114,20 @@ public:
 
 private:
     /**
-     * @brief Prints the start panel with game instructions and commands.
+     * @brief Prints the info panel according to specified version.
+     * @param v Panel version to display.
+     * @param p Pointer to player whose nickname will be shown.
      * 
-     * Displays title, movement instructions, and available commands.
+     * Available panels:
+     * - info: Initial screen with first player info
+     * - game_time: Active game screen expecting player's move
+     * - game_time_error: Same as game_time but with error message
+     * - game_over: Final screen with winner info
+     * 
+     * If p is NULL, displays default message.
      * Updates output line counter.
      */
-    void PrintStartPanel();
-
-    /**
-     * @brief Prints the end panel with game results.
-     * 
-     * Displays game over message and winner information.
-     * If winner is NULL, displays draw message.
-     * Updates output line counter.
-     * 
-     * @param winner Pointer to the winning player (NULL for draw).
-     */
-    void PrintEndPanel(const Player *winner = 0);
+    void PrintPanel(panel_version v, const Player *p = 0);
 
     /**
      * @brief Prints the playing field with current marks.

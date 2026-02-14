@@ -33,16 +33,14 @@ ConsoleUI::ConsoleUI()
     ClearField();
 }
 
-void ConsoleUI::PrintUI(print_mode md, const Player *winner)
+void ConsoleUI::Print(panel_version v, const Player *p)
 {
-    if (md == active) { PrintStartPanel(); }
-    else { PrintEndPanel(winner); }
-
+    PrintPanel(v, p);
     PrintSeparator();
     PrintField();
 }
 
-void ConsoleUI::ClearUI()
+void ConsoleUI::Clear()
 {
     for (int i = 0; i < output_lines; i++) {
         fputs("\033[2K", stdout);
@@ -96,57 +94,89 @@ void ConsoleUI::ClearField()
     }
 }
 
-void ConsoleUI::PrintStartPanel()
-{
-    printf(" _____________________________\n");
-	printf("|         Tic Tac Toe         |\n");
-	printf("| To move, enter the row and  |\n");
-	printf("| column separated by a space.|\n");
-	printf("|                             |\n");
-	printf("| Commands:                   |\n");
-	printf("| q - quit                    |\n");
-	printf("| r - restart                 |\n");
-	printf("| n - change nickname         |\n");
-	printf("| m - change mark             |\n");
-	printf("|                             |\n");
-	printf("| Enjoy the game!             |\n");
-	printf("|_____________________________|\n");
-
-    fflush(stdout);
-    output_lines += panel_lines;
-}
-
-void ConsoleUI::PrintEndPanel(const Player *winner)
+void ConsoleUI::PrintPanel(panel_version v, const Player *p)
 {
     char nickname[28];
     size_t nick_size = sizeof(nickname);
     memset(nickname, 0, sizeof(nickname));
 
-    if (winner == 0) {
-        strncpy(nickname, "No one, just no one ...", nick_size - 1);
-    }
-    else {
-        size_t nick_len = winner->GetLengthNickname();
-        strncpy(nickname, winner->GetNickname(), 
+    if (p) {
+        size_t nick_len = p->GetLengthNickname();
+        strncpy(nickname, p->GetNickname(), 
                 nick_size - 1 > nick_len ? nick_len : nick_size - 1);
     }
+    else {
+        strncpy(nickname, "  No one, just no one ...", nick_size - 1);
+    }
 
-    printf(" _____________________________\n");
-    printf("|         Tic Tac Toe         |\n");
-    printf("|          GAME OVER          |\n");
-    printf("|        The winner is        |\n");
-    printf("|                             |\n");
-    printf("| %-27s |\n"                      , nickname);
-    printf("|                             |\n");
-    printf("| Commands:                   |\n");
-    printf("| q - quit                    |\n");
-    printf("| r - restart                 |\n");
-    printf("|                             |\n");
-    printf("| Come back again!            |\n");
-    printf("|_____________________________|\n");
+    switch (v) {
+        case info:
+            printf(" _____________________________\n");
+            printf("|         Tic Tac Toe         |\n");
+            printf("|         INFORMATION         |\n");
+            printf("| To move, enter the row and  |\n");
+            printf("| column separated by a space.|\n");
+            printf("|                             |\n");
+            printf("|   The first move is for:    |\n");
+            printf("|                             |\n");
+            printf("| %-27s |\n"                      , nickname);
+            printf("|                             |\n");
+            printf("|                             |\n");
+            printf("|       Enjoy the game!       |\n");
+            printf("|_____________________________|\n");
+            break;
 
-    fflush(stdout);
+        case game_time:
+            printf(" _____________________________\n");
+            printf("|         Tic Tac Toe         |\n");
+            printf("|          GAME TIME          |\n");
+            printf("|   Player's expected move:   |\n");
+            printf("|                             |\n");
+            printf("| %-27s |\n"                      , nickname);
+            printf("|                             |\n");
+            printf("| Commands:                   |\n");
+            printf("| q - quit                    |\n");
+            printf("| r - restart                 |\n");
+            printf("|                             |\n");
+            printf("|                             |\n");
+            printf("|_____________________________|\n");
+            break;
+        
+        case game_time_error:
+            printf(" _____________________________\n");
+            printf("|         Tic Tac Toe         |\n");
+            printf("|          GAME TIME          |\n");
+            printf("|   Player's expected move:   |\n");
+            printf("|                             |\n");
+            printf("| %-27s |\n"                      , nickname);
+            printf("|                             |\n");
+            printf("| Commands:                   |\n");
+            printf("| q - quit                    |\n");
+            printf("| r - restart                 |\n");
+            printf("|                             |\n");
+            printf("|  Invalid input. Try again!  |\n");
+            printf("|_____________________________|\n");
+            break;
+
+        case game_over:
+            printf(" _____________________________\n");
+            printf("|         Tic Tac Toe         |\n");
+            printf("|          GAME OVER          |\n");
+            printf("|        The winner is        |\n");
+            printf("|                             |\n");
+            printf("| %-27s |\n"                      , nickname);
+            printf("|                             |\n");
+            printf("| Commands:                   |\n");
+            printf("| q - quit                    |\n");
+            printf("| r - restart                 |\n");
+            printf("|                             |\n");
+            printf("|       Come back again!      |\n");
+            printf("|_____________________________|\n");
+            break;
+    }
+
     output_lines += panel_lines;
+    fflush(stdout);
 }
 
 void ConsoleUI::PrintField()
