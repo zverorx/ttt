@@ -37,7 +37,7 @@ enum field_size { row_count = 3, col_count = 3 };
 enum print_mode { active, finish };
 
 /**
- * @class ConcoleUI
+ * @class ConsoleUI
  * @brief Manages the display of the game panel and playing field.
  */
 class ConsoleUI {
