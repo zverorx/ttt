@@ -21,6 +21,8 @@
 #ifndef PLAYER_H_SENTRY
 #define PLAYER_H_SENTRY
 
+#include <stddef.h>
+
 /**
  * @class Player
  * @brief The participant of the game. 
