@@ -38,9 +38,13 @@ const char *Player::GetNickname() const
     return nickname;
 }
 
-char Player::GetMark() const
+size_t Player::GetLengthNickname() const
 {
-    return mark;
+    size_t len = 0;
+    size_t nick_size = sizeof(nickname);
+
+    for (; len < nick_size && nickname[len] != '\0'; len++); 
+    return len;
 }
 
 bool Player::SetNickname(const char *nickname)
@@ -52,6 +56,11 @@ bool Player::SetNickname(const char *nickname)
     this->nickname[sizeof(this->nickname) - 1] = '\0';
 
     return true;
+}
+
+char Player::GetMark() const
+{
+    return mark;
 }
 
 bool Player::SetMark(char mark)

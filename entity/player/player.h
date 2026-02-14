@@ -41,8 +41,10 @@ public:
     Player(const char *nickname, char mark);
 
     const char *GetNickname() const;
-    char GetMark() const;
+    size_t GetLengthNickname() const;
     bool SetNickname(const char *nickname);
+
+    char GetMark() const;
     bool SetMark(char mark);
 };
 
