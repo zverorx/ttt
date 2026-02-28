@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "console_ui.h"
 
@@ -27,10 +28,16 @@ ConsoleUI::ConsoleUI()
     : default_fill('_')
     , output_lines(0)
     , panel_lines(14)
-    , field_lines(6)
+    , field_lines(7)
     , separator_lines(1)
 {
+    memset(gameplay, 0, sizeof(gameplay));
     ClearField();
+}
+
+ConsoleUI::~ConsoleUI()
+{
+    DeleteAllMove();
 }
 
 void ConsoleUI::Print(panel_version v, const Player *p)
@@ -38,6 +45,7 @@ void ConsoleUI::Print(panel_version v, const Player *p)
     PrintPanel(v, p);
     PrintSeparator();
     PrintField();
+    PrintGameplay();
 }
 
 void ConsoleUI::Clear()
@@ -51,6 +59,43 @@ void ConsoleUI::Clear()
 
     fputc('\r', stdout);
     fflush(stdout);
+}
+
+bool ConsoleUI::AddMove(const char *str, size_t len)
+{
+    if (!str || len <= 0) { return false; }
+
+    for (int i = 0; i < GAMEPLAY_SIZE; i++) {
+        if (gameplay[i] != 0) { continue; }
+
+        gameplay[i] = static_cast<char *>(calloc(len + 1, sizeof(char)));
+        if (!gameplay[i]) { return false; }
+
+        strncpy(gameplay[i], str, len);
+        gameplay[i][len] = '\0';
+        return true;
+    }
+
+    return false;
+}
+
+bool ConsoleUI::DeleteMove(int index)
+{
+    if (index < 0 || index > GAMEPLAY_SIZE - 1) { return false; }
+
+    free(gameplay[index]);
+
+    gameplay[index] = static_cast<char *>(0);
+
+    return true;
+}
+    
+void ConsoleUI::DeleteAllMove()
+{
+    for (int i = 0; i < GAMEPLAY_SIZE; i++) {
+        free(gameplay[i]);
+        gameplay[i] = static_cast<char *>(0);
+    }
 }
 
 bool ConsoleUI::IsBusy(int rowi, int coli, char &mark) const
@@ -185,7 +230,7 @@ void ConsoleUI::PrintField()
 	printf("\t   ___ ___ ___\n");
 	printf("\t0 |_%c_|_%c_|_%c_|\n", field[0][0], field[0][1], field[0][2]);
 	printf("\t1 |_%c_|_%c_|_%c_|\n", field[1][0], field[1][1], field[1][2]);
-	printf("\t2 |_%c_|_%c_|_%c_|\n", field[2][0], field[2][1], field[2][2]);
+	printf("\t2 |_%c_|_%c_|_%c_|\n\n", field[2][0], field[2][1], field[2][2]);
 
     fflush(stdout);
     output_lines += field_lines;
@@ -195,4 +240,16 @@ void ConsoleUI::PrintSeparator()
 {
     printf("\n[=============================]\n");
     output_lines += separator_lines;
+}
+
+void ConsoleUI::PrintGameplay()
+{
+    for (int i = 0; i < GAMEPLAY_SIZE; i++) {
+        if (gameplay[i]) {
+            printf("%s\n", gameplay[i]);
+            output_lines++;
+        }
+    }
+
+    fflush(stdout);
 }

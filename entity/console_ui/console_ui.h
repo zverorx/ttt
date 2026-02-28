@@ -24,6 +24,12 @@
 #include "../player/player.h"
 
 /**
+ * @def GAMEPALY_SIZE
+ * @brief ConsoleUI::gameplay size
+ */
+#define GAMEPLAY_SIZE   10
+
+/**
  * @enum field_size
  * @brief The size of the playing field.
  */
@@ -48,6 +54,7 @@ class ConsoleUI {
 private:
     char field[row_count][col_count];   /**< Playing field          */
     const char default_fill;            /**< Default cell content   */
+    char *gameplay[GAMEPLAY_SIZE];      /**< Description of each move */
 
     int output_lines;                   /**< Lines printed to stdout*/
     const int panel_lines;              /**< Lines in info panel    */
@@ -55,6 +62,7 @@ private:
     const int separator_lines;          /**< Lines in separator     */
 public:
     ConsoleUI();
+    ~ConsoleUI();
 
     /**
      * @brief Prints the complete game interface.
@@ -77,6 +85,26 @@ public:
      *       \033[1A – Move cursor up one line
      */
     void Clear();
+
+    /**
+     * @brief Adds a move description to history.
+     * @param str Source string (null-terminated).
+     * @param len Number of characters to copy.
+     * @return true if added successfully, false otherwise.
+     */
+    bool AddMove(const char *str, size_t len);
+
+    /**
+     * @brief Deletes a move from history by index.
+     * @param index Position in gameplay array.
+     * @return true if deleted successfully, false otherwise.
+     */
+    bool DeleteMove(int index);
+
+    /**
+     * @brief Deletes all moves from history.
+     */
+    void DeleteAllMove();
 
     /**
      * @brief Checks if the cell is occupied and returns its mark.
@@ -113,6 +141,9 @@ public:
     void ClearField();
 
 private:
+    ConsoleUI(ConsoleUI &ui);
+    void operator=(ConsoleUI &ui);
+
     /**
      * @brief Prints the info panel according to specified version.
      * @param v Panel version to display.
@@ -142,6 +173,13 @@ private:
      * Updates output line counter.
      */
     void PrintSeparator();
+
+    /**
+     * @brief Prints the gameplay history.
+     * 
+     * Updates output line counter.
+     */
+    void PrintGameplay();
 };
 
 #endif /* CONSOLE_UI_H_SENTRY */
