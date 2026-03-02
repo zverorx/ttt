@@ -10,12 +10,14 @@ BINDIR = bin
 SOURCES = main.cpp							\
 		  entity/game/game.cpp				\
 		  entity/player/player.cpp			\
-		  entity/console_ui/console_ui.cpp
+		  entity/console_ui/console_ui.cpp	\
+		  entity/terminal/terminal.cpp
 
-OBJECTS = $(OBJDIR)/main.o		\
-		  $(OBJDIR)/game.o		\
-		  $(OBJDIR)/player.o	\
-		  $(OBJDIR)/console_ui.o
+OBJECTS = $(OBJDIR)/main.o			\
+		  $(OBJDIR)/game.o			\
+		  $(OBJDIR)/player.o		\
+		  $(OBJDIR)/console_ui.o	\
+		  $(OBJDIR)/terminal.o
 
 CXXFAGS ?=
 LDFLAGS ?=
@@ -36,7 +38,10 @@ ifeq ($(CXX), gcc)
 endif
 
 
-VPATH = entity/game entity/player entity/console_ui
+VPATH = entity/game			\
+		entity/player		\
+		entity/console_ui	\
+		entity/terminal
 
 all : $(BINDIR)/$(TARGET) 
 
