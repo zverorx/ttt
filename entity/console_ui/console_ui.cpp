@@ -27,9 +27,9 @@
 ConsoleUI::ConsoleUI() 
     : default_fill('_')
     , output_lines(0)
-    , panel_lines(14)
-    , field_lines(7)
-    , separator_lines(1)
+    , panel_lines(13)
+    , field_lines(5)
+    , separator_lines(2)
 {
     memset(gameplay, 0, sizeof(gameplay));
     ClearField();
@@ -168,7 +168,7 @@ void ConsoleUI::PrintPanel(panel_version v, const Player *p)
             printf("|                             |\n");
             printf("|                             |\n");
             printf("|       Enjoy the game!       |\n");
-            printf("|_____________________________|\n");
+            printf("|_____________________________|");
             break;
 
         case game_time:
@@ -184,7 +184,7 @@ void ConsoleUI::PrintPanel(panel_version v, const Player *p)
             printf("| r - restart                 |\n");
             printf("|                             |\n");
             printf("|                             |\n");
-            printf("|_____________________________|\n");
+            printf("|_____________________________|");
             break;
         
         case game_time_error:
@@ -200,7 +200,7 @@ void ConsoleUI::PrintPanel(panel_version v, const Player *p)
             printf("| r - restart                 |\n");
             printf("|                             |\n");
             printf("|  Invalid input. Try again!  |\n");
-            printf("|_____________________________|\n");
+            printf("|_____________________________|");
             break;
 
         case game_over:
@@ -216,7 +216,7 @@ void ConsoleUI::PrintPanel(panel_version v, const Player *p)
             printf("| r - restart                 |\n");
             printf("|                             |\n");
             printf("|       Come back again!      |\n");
-            printf("|_____________________________|\n");
+            printf("|_____________________________|");
             break;
     }
 
@@ -224,32 +224,40 @@ void ConsoleUI::PrintPanel(panel_version v, const Player *p)
     fflush(stdout);
 }
 
+void ConsoleUI::PrintSeparator()
+{
+    printf("\n\n[=============================]");
+
+    fflush(stdout);
+    output_lines += separator_lines;
+}
+
 void ConsoleUI::PrintField()
 {
-	printf("\t    0   1   2\n");
+	printf("\n\t    0   1   2\n");
 	printf("\t   ___ ___ ___\n");
 	printf("\t0 |_%c_|_%c_|_%c_|\n", field[0][0], field[0][1], field[0][2]);
 	printf("\t1 |_%c_|_%c_|_%c_|\n", field[1][0], field[1][1], field[1][2]);
-	printf("\t2 |_%c_|_%c_|_%c_|\n\n", field[2][0], field[2][1], field[2][2]);
+	printf("\t2 |_%c_|_%c_|_%c_|", field[2][0], field[2][1], field[2][2]);
 
     fflush(stdout);
     output_lines += field_lines;
 }
 
-void ConsoleUI::PrintSeparator()
-{
-    printf("\n[=============================]\n");
-    output_lines += separator_lines;
-}
-
 void ConsoleUI::PrintGameplay()
 {
+    putc('\n', stdout);
+    output_lines++;
+
+    putc('\n', stdout);
+    output_lines++;
+
     for (int i = 0; i < GAMEPLAY_SIZE; i++) {
         if (gameplay[i]) {
             printf("%s\n", gameplay[i]);
             output_lines++;
         }
     }
-
+    
     fflush(stdout);
 }

@@ -48,7 +48,7 @@ enum panel_version { info, game_time, game_time_error, game_over };
 
 /**
  * @class ConsoleUI
- * @brief Manages the display of the game panel and playing field.
+ * @brief Rendering of info panels, playing field, and player moves.
  */
 class ConsoleUI {
 private:
@@ -161,18 +161,18 @@ private:
     void PrintPanel(panel_version v, const Player *p = 0);
 
     /**
-     * @brief Prints the playing field with current marks.
-     * 
-     * Updates output line counter.
-     */
-    void PrintField();
-
-    /**
      * @brief Prints a separator line between panel and field.
      * 
      * Updates output line counter.
      */
     void PrintSeparator();
+
+    /**
+     * @brief Prints the playing field with current marks.
+     * 
+     * Updates output line counter.
+     */
+    void PrintField();
 
     /**
      * @brief Prints the gameplay history.
