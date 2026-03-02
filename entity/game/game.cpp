@@ -24,8 +24,7 @@
 
 #include "game.h"
 
-#define RED     31
-#define BLUE    34 
+enum color { red = 31, blue = 34};
 
 Game::Game()
     : curr_p(0)
@@ -35,74 +34,65 @@ Game::Game()
     p2 = new Player("         ><[O_O]><", 'O');
 
     ui = new ConsoleUI();
+    terminal = new Terminal();
 }
 
 Game::~Game()
 {
     delete p1;
     delete p2;
-    delete curr_p;
     delete ui;
+    delete terminal;
 }
 
 void Game::Start()
 {
-    int res_ph, rowi, coli;
-    char swtch = 0;
+    int res_move, rowi, coli;
+
+    terminal->DisableICanon(0, 1);
+    terminal->DisableEcho();
 
     Intro();
 
-    for (int i = 0, move = 0; ; i++) {
+    terminal->DisableICanon(0, 4);
+    terminal->EnableEcho();
+
+    for (int i = 0, move = 0, swtch = 0; ; i++) {
         curr_p = i % 2 ? p1 : p2;
         ui->Print(game_time, curr_p);
 
-        if (i == 0) { printf("\n0%c START\n", prompt); }
-        else { fprintf(stdout, "\033[%dB", 2 + i); }
-
         swtch = !swtch;
         if (swtch) { move++; }
+
         for (;;) {
-            res_ph = PromptHandle(move, rowi, coli, i % 2 ? BLUE : RED);
-            if (res_ph) {
+            res_move = PromptHandle(move, rowi, coli, i % 2 ? blue : red);
+            if (res_move) {
                 ui->SetMark(rowi, coli, *curr_p);
-                break; 
+                break;
             }
             else {
-                fputs("\033[2K\033[1A\033[2K", stdout);
-                fprintf(stdout, "\033[2K\033[%dA", 2 + i);
                 ui->Clear();
                 ui->Print(game_time_error, curr_p);
-                fprintf(stdout, "\033[%dB", 2 + i);
-                fflush(stdout);
             }
         }
 
-        fprintf(stdout, "\033[%dA", 3 + i);
         ui->Clear();
     }
 }
 
 void Game::Intro() const
 {
-    int symbol;
+    char buff[80];
 
     ui->Print(info, p2);
 
-    for(;;) {
-        printf("\n%c PRESS ENTER TO START", prompt);
+    printf("%c PRESS ANY TO START...", prompt);
+    getc(stdin);
+    fputs("\r\033[2K", stdout);
+    fflush(stdout);
 
-        symbol = fgetc(stdin);
-
-        fputs("\033[2K\033[A", stdout);
-        fflush(stdout);
-
-        if (symbol == '\n') { 
-            fputs("\033[2K\033[1A", stdout);
-            break; 
-        }
-
-        if (symbol == EOF) { clearerr(stdin); }
-    }
+    snprintf(buff, sizeof(buff), "0%c START", prompt);
+    ui->AddMove(buff, sizeof(buff));
 
     ui->Clear();
 }
@@ -110,18 +100,38 @@ void Game::Intro() const
 bool Game::PromptHandle(int move_count, int &rowi, 
                         int &coli, int color_code) const
 {
-    char buff[8];
-    int res_sscanf;
-    char mark;
+    char line_buff[80];
+    char input_buff[5];
 
-    memset(buff, 0, sizeof(buff));
+    memset(line_buff, 0, sizeof(line_buff));
+    memset(input_buff, 0, sizeof(input_buff));
+
+    size_t size_input_buff = sizeof(input_buff);
+    size_t len_input_buff = size_input_buff - 1; /* minus '\0' */
+
+    char mark;
 
     printf("\033[%dm%d%c\033[0m ", color_code, move_count, prompt);
 
-    fgets(buff, sizeof(buff), stdin);
-    res_sscanf = sscanf(buff, "%d %d\n", &rowi, &coli);
+    for (size_t i = 0; i < len_input_buff; i++) {
+        input_buff[i] = fgetc(stdin);
+        if (input_buff[i] == '\n') { break; }
+        if (i == len_input_buff - 1) {
+            input_buff[i] = '\n';
+            fputc('\n', stdout);
+        }
+    }
+
+    fputs("\r\033[2K\033[1A", stdout);
+    fflush(stdout);
+
+    int res_sscanf = sscanf(input_buff, "%d %d\n", &rowi, &coli);
     if (res_sscanf != 2) { return false; }
     if (ui->IsBusy(rowi, coli, mark)) { return false; }
+
+    snprintf(line_buff, sizeof(line_buff), "\033[%dm%d%c\033[0m %d %d",
+             color_code, move_count, prompt, rowi, coli);
+    ui->AddMove(line_buff, sizeof(line_buff));
 
     return true;
 }

@@ -23,11 +23,13 @@
 
 #include "../player/player.h"
 #include "../console_ui/console_ui.h"
+#include "../terminal/terminal.h"
 
 class Game {
 private:
     Player *p1, *p2, *curr_p;
     ConsoleUI *ui;
+    Terminal *terminal;
     const char prompt;
 
 public:
