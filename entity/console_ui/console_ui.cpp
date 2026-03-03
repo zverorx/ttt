@@ -103,7 +103,7 @@ bool ConsoleUI::IsBusy(int rowi, int coli, char &mark) const
     if ((rowi > row_count - 1 || rowi < 0 ) ||
         (coli > col_count - 1 || coli < 0 )) { 
         mark = '\0';
-        return false;
+        return true;
     }
 
     mark = field[rowi][coli];

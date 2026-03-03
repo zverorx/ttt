@@ -111,8 +111,9 @@ public:
      * @param rowi Row index (0 to row_count-1).
      * @param coli Column index (0 to col_count-1).
      * @param[out] mark Reference to store the cell's mark.
-     * @return true If cell is occupied.
-     * @return false If coordinates invalid (mark = '\0') or cell is free.
+     *                  If coordinates are invalid, mark = '\0'.
+     * @return true If cell is occupied or coordinates are invalid.
+     * @return false If cell is free.
      */
     bool IsBusy(int rowi, int coli, char &mark) const;
 
