@@ -77,11 +77,11 @@ pmove_t Game::Start()
                     return restart;
                 case invalid_input:
                     ui->Clear(); 
-                    ui->Print(game_time_error, curr_p);
+                    ui->Print(input_error, curr_p);
                     break;
                 case cell_is_busy:
                     ui->Clear(); 
-                    ui->Print(game_time_error, curr_p); /* TODO: new panel */
+                    ui->Print(busy_error, curr_p);
                     break;
             }
         }
