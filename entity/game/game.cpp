@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <pwd.h>
 
 #include "game.h"
 
@@ -30,7 +31,9 @@ Game::Game()
     : curr_p(0)
     , prompt('>')
 {
-    p1 = new Player("Player", 'X');
+    passwd *pas = getpwuid(geteuid());
+    p1 = pas ? new Player(pas->pw_name, 'X') : new Player("Player", 'X');
+
     p2 = new Player("         ><[O_O]><", 'O');
     ui = new ConsoleUI();
     terminal = new Terminal();
@@ -99,7 +102,9 @@ void Game::Reset()
     delete ui;
     delete terminal;
 
-    p1 = new Player("Player1", 'X');
+    passwd *pas = getpwuid(geteuid());
+    p1 = pas ? new Player(pas->pw_name, 'X') : new Player("Player", 'X');
+
     p2 = new Player("         ><[O_O]><", 'O');
     ui = new ConsoleUI();
     terminal = new Terminal();
