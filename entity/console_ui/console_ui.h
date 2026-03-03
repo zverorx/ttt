@@ -185,6 +185,19 @@ private:
      * Updates output line counter.
      */
     void PrintGameplay();
+
+    /**
+     * @brief Centers nickname in 27-char panel buffer.
+     * 
+     * @param[out] dest Output buffer (size 28).
+     * @param src Input nickname.
+     * @param src_len Nickname length
+     * 
+     * Calculates padding to center onick in 27-width panel.
+     * Truncates if nickname exceeds panel width.
+     */ 
+    void NickAlignment(char (&dest)[28], 
+                       const char *src, size_t src_size) const;
 };
 
 #endif /* CONSOLE_UI_H_SENTRY */

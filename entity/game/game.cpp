@@ -34,7 +34,7 @@ Game::Game()
     passwd *pas = getpwuid(geteuid());
     p1 = pas ? new Player(pas->pw_name, 'X') : new Player("Player", 'X');
 
-    p2 = new Player("         ><[O_O]><", 'O');
+    p2 = new Player("><[O_O]><", 'O');
     ui = new ConsoleUI();
     terminal = new Terminal();
 }

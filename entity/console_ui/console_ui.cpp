@@ -142,16 +142,13 @@ void ConsoleUI::ClearField()
 void ConsoleUI::PrintPanel(panel_version v, const Player *p)
 {
     char nickname[28];
-    size_t nick_size = sizeof(nickname);
     memset(nickname, 0, sizeof(nickname));
 
     if (p) {
-        size_t nick_len = p->GetLengthNickname();
-        strncpy(nickname, p->GetNickname(), 
-                nick_size - 1 > nick_len ? nick_len : nick_size - 1);
+        NickAlignment(nickname, p->GetNickname(), p->GetLengthNickname());
     }
     else {
-        strncpy(nickname, "  No one, just no one ...", nick_size - 1);
+        strncpy(nickname, "  No one, just no one ...", sizeof(nickname) - 1);
     }
 
     switch (v) {
@@ -276,4 +273,21 @@ void ConsoleUI::PrintGameplay()
     }
     
     fflush(stdout);
+}
+
+void ConsoleUI::NickAlignment(char (&dest)[28], 
+                              const char *src, size_t src_len) const
+{
+    off_t offset;
+    size_t dest_size = sizeof(dest);
+    memset(dest, 0, dest_size);
+
+    /* 27 is the width of the panel */
+    if (src_len > 27) { offset = 0; }
+    else { offset = (27 - src_len) / 2; }
+
+    for (int i = 0; i < offset; i++) { dest[i] = ' '; }
+
+    strncpy(dest + offset, src, 
+            dest_size - 1 > src_len ? src_len : dest_size - 1);
 }
