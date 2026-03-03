@@ -25,6 +25,14 @@
 #include "../console_ui/console_ui.h"
 #include "../terminal/terminal.h"
 
+typedef enum player_move {
+    success         = 0,
+    invalid_input   = 1,
+    cell_is_busy    = 2,
+    quit            = 3,
+    restart         = 4
+} pmove_t;
+
 class Game {
 private:
     Player *p1, *p2, *curr_p;
@@ -36,14 +44,15 @@ public:
     Game();
     ~Game();
 
-    void Start();
+    pmove_t Start();
+    void Reset();
 private:
     Game(Game &g);
     void operator=(Game &g);
 
     void Intro() const;
-    bool PromptHandle(int move_count, int &rowi, 
-                      int &coli, int color_code) const;
+    pmove_t ProcessPlayerMove(int move_count, int &rowi, 
+                              int &coli, int color_code) const;
 };
 
 #endif /* GAME_H_SENTRY */

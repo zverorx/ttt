@@ -30,9 +30,8 @@ Game::Game()
     : curr_p(0)
     , prompt('>')
 {
-    p1 = new Player("Player1", 'X');
+    p1 = new Player("Player", 'X');
     p2 = new Player("         ><[O_O]><", 'O');
-
     ui = new ConsoleUI();
     terminal = new Terminal();
 }
@@ -45,9 +44,10 @@ Game::~Game()
     delete terminal;
 }
 
-void Game::Start()
+pmove_t Game::Start()
 {
-    int res_move, rowi, coli;
+    int rowi, coli;
+    pmove_t res_move;
 
     terminal->DisableICanon(0, 1);
     terminal->DisableEcho();
@@ -64,20 +64,47 @@ void Game::Start()
         swtch = !swtch;
         if (swtch) { move++; }
 
-        for (;;) {
-            res_move = PromptHandle(move, rowi, coli, i % 2 ? blue : red);
-            if (res_move) {
-                ui->SetMark(rowi, coli, *curr_p);
-                break;
-            }
-            else {
-                ui->Clear();
-                ui->Print(game_time_error, curr_p);
+        for (bool run = true; run;) {
+            res_move = ProcessPlayerMove(move, rowi, coli, i % 2 ? blue : red);
+            switch (res_move) {
+                case success:
+                    ui->SetMark(rowi, coli, *curr_p);
+                    run = false;
+                    break;
+                case quit: return quit;
+                case restart: 
+                    ui->Clear(); 
+                    return restart;
+                case invalid_input:
+                    ui->Clear(); 
+                    ui->Print(game_time_error, curr_p);
+                    break;
+                case cell_is_busy:
+                    ui->Clear(); 
+                    ui->Print(game_time_error, curr_p); /* TODO: new panel */
+                    break;
             }
         }
 
         ui->Clear();
     }
+
+    return quit;
+}
+
+void Game::Reset()
+{
+    delete p1;
+    delete p2;
+    delete ui;
+    delete terminal;
+
+    p1 = new Player("Player1", 'X');
+    p2 = new Player("         ><[O_O]><", 'O');
+    ui = new ConsoleUI();
+    terminal = new Terminal();
+
+    curr_p = 0;
 }
 
 void Game::Intro() const
@@ -97,8 +124,8 @@ void Game::Intro() const
     ui->Clear();
 }
 
-bool Game::PromptHandle(int move_count, int &rowi, 
-                        int &coli, int color_code) const
+pmove_t Game::ProcessPlayerMove(int move_count, int &rowi, 
+                                int &coli, int color_code) const
 {
     char line_buff[80];
     char input_buff[5];
@@ -109,29 +136,35 @@ bool Game::PromptHandle(int move_count, int &rowi,
     size_t size_input_buff = sizeof(input_buff);
     size_t len_input_buff = size_input_buff - 1; /* minus '\0' */
 
-    char mark;
-
     printf("\033[%dm%d%c\033[0m ", color_code, move_count, prompt);
 
     for (size_t i = 0; i < len_input_buff; i++) {
         input_buff[i] = fgetc(stdin);
         if (input_buff[i] == '\n') { break; }
         if (i == len_input_buff - 1) {
+            fputc('\n', stdout); 
+
+            if (strcmp("quit", input_buff) == 0) { return quit; }
+            if (strcmp("rest", input_buff) == 0) { 
+                fputs("\033[1A", stdout);
+                return restart;
+            }
+
             input_buff[i] = '\n';
-            fputc('\n', stdout);
         }
     }
 
     fputs("\r\033[2K\033[1A", stdout);
     fflush(stdout);
 
-    int res_sscanf = sscanf(input_buff, "%d %d\n", &rowi, &coli);
-    if (res_sscanf != 2) { return false; }
-    if (ui->IsBusy(rowi, coli, mark)) { return false; }
+    int res_sscanf = sscanf(input_buff, "%d %d", &rowi, &coli);
+    if (res_sscanf != 2) { return invalid_input; }
+    char mark;
+    if (ui->IsBusy(rowi, coli, mark)) { return cell_is_busy; }
 
     snprintf(line_buff, sizeof(line_buff), "\033[%dm%d%c\033[0m %d %d",
              color_code, move_count, prompt, rowi, coli);
     ui->AddMove(line_buff, sizeof(line_buff));
 
-    return true;
+    return success;
 }
