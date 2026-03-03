@@ -180,8 +180,8 @@ void ConsoleUI::PrintPanel(panel_version v, const Player *p)
             printf("| %-27s |\n"                      , nickname);
             printf("|                             |\n");
             printf("| Commands:                   |\n");
-            printf("| q - quit                    |\n");
-            printf("| r - restart                 |\n");
+            printf("| - quit (to exit)            |\n");
+            printf("| - rest (to restart)         |\n");
             printf("|                             |\n");
             printf("|                             |\n");
             printf("|_____________________________|");
@@ -196,8 +196,8 @@ void ConsoleUI::PrintPanel(panel_version v, const Player *p)
             printf("| %-27s |\n"                      , nickname);
             printf("|                             |\n");
             printf("| Commands:                   |\n");
-            printf("| q - quit                    |\n");
-            printf("| r - restart                 |\n");
+            printf("| - quit (to exit)            |\n");
+            printf("| - rest (to restart)         |\n");
             printf("|                             |\n");
             printf("|  Invalid input. Try again!  |\n");
             printf("|_____________________________|");
@@ -212,8 +212,8 @@ void ConsoleUI::PrintPanel(panel_version v, const Player *p)
             printf("| %-27s |\n"                      , nickname);
             printf("|                             |\n");
             printf("| Commands:                   |\n");
-            printf("| q - quit                    |\n");
-            printf("| r - restart                 |\n");
+            printf("| - quit (to exit)            |\n");
+            printf("| - rest (to restart)         |\n");
             printf("|                             |\n");
             printf("|  Cell is busy.  Try again!  |\n");
             printf("|_____________________________|");
@@ -228,8 +228,8 @@ void ConsoleUI::PrintPanel(panel_version v, const Player *p)
             printf("| %-27s |\n"                      , nickname);
             printf("|                             |\n");
             printf("| Commands:                   |\n");
-            printf("| q - quit                    |\n");
-            printf("| r - restart                 |\n");
+            printf("| - quit (to exit)            |\n");
+            printf("| - rest (to restart)         |\n");
             printf("|                             |\n");
             printf("|       Come back again!      |\n");
             printf("|_____________________________|");
