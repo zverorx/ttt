@@ -187,7 +187,7 @@ void ConsoleUI::PrintPanel(panel_version v, const Player *p)
             printf("|_____________________________|");
             break;
         
-        case game_time_error:
+        case input_error:
             printf(" _____________________________\n");
             printf("|         Tic Tac Toe         |\n");
             printf("|          GAME TIME          |\n");
@@ -200,6 +200,22 @@ void ConsoleUI::PrintPanel(panel_version v, const Player *p)
             printf("| r - restart                 |\n");
             printf("|                             |\n");
             printf("|  Invalid input. Try again!  |\n");
+            printf("|_____________________________|");
+            break;
+
+        case busy_error:
+            printf(" _____________________________\n");
+            printf("|         Tic Tac Toe         |\n");
+            printf("|          GAME TIME          |\n");
+            printf("|   Player's expected move:   |\n");
+            printf("|                             |\n");
+            printf("| %-27s |\n"                      , nickname);
+            printf("|                             |\n");
+            printf("| Commands:                   |\n");
+            printf("| q - quit                    |\n");
+            printf("| r - restart                 |\n");
+            printf("|                             |\n");
+            printf("|  Cell is busy.  Try again!  |\n");
             printf("|_____________________________|");
             break;
 
