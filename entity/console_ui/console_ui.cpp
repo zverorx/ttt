@@ -216,6 +216,22 @@ void ConsoleUI::PrintPanel(panel_version v, const Player *p)
             printf("|_____________________________|");
             break;
 
+        case range_error:
+            printf(" _____________________________\n");
+            printf("|         Tic Tac Toe         |\n");
+            printf("|          GAME TIME          |\n");
+            printf("|   Player's expected move:   |\n");
+            printf("|                             |\n");
+            printf("| %-27s |\n"                      , nickname);
+            printf("|                             |\n");
+            printf("| Commands:                   |\n");
+            printf("| - quit (to exit)            |\n");
+            printf("| - rest (to restart)         |\n");
+            printf("|                             |\n");
+            printf("|  Out of range.  Try again!  |\n");
+            printf("|_____________________________|");
+            break;
+
         case game_over:
             printf(" _____________________________\n");
             printf("|         Tic Tac Toe         |\n");

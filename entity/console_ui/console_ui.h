@@ -41,14 +41,20 @@ enum field_size { row_count = 3, col_count = 3 };
  * @brief Available panel display modes.
  * 
  * @var info Initial information panel.
- * @var game_time Active game panel expecting move.
+ * @var game_time Active game panel.
  * @var input_error Game panel with input error message.
  * @var busy_error Game panel with busy cell message.
+ * @var range_error Game panel with out of range message.
  * @var game_over Final panel showing winner.
  * 
  * @see Console::Print
  */
-enum panel_version { info, game_time, input_error, busy_error, game_over };
+enum panel_version { 
+    info, 
+    game_time, 
+    input_error, busy_error, range_error, 
+    game_over 
+};
 
 /**
  * @class ConsoleUI

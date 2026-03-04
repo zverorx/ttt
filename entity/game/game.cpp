@@ -86,6 +86,10 @@ pmove_t Game::Start()
                     ui->Clear(); 
                     ui->Print(busy_error, plr[curr_plr_i]);
                     break;
+                case out_of_range:
+                    ui->Clear(); 
+                    ui->Print(range_error, plr[curr_plr_i]);
+                    break;
             }
         }
 
@@ -171,7 +175,10 @@ pmove_t Game::ProcessPlayerMove(int move_count, int &rowi,
     int res_sscanf = sscanf(input_buff, "%d %d", &rowi, &coli);
     if (res_sscanf != 2) { return invalid_input; }
     char mark;
-    if (ui->IsBusy(rowi, coli, mark)) { return cell_is_busy; }
+    if (ui->IsBusy(rowi, coli, mark)) {
+        if (mark != '\0') { return cell_is_busy; }
+        else { return out_of_range; }
+    }
 
     snprintf(line_buff, sizeof(line_buff), "\033[%dm%d%c\033[0m %d %d",
              color_code, move_count, prompt, rowi, coli);

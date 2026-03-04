@@ -31,8 +31,9 @@ typedef enum player_move {
     success         = 0,
     invalid_input   = 1,
     cell_is_busy    = 2,
-    quit            = 3,
-    restart         = 4
+    out_of_range    = 3,
+    quit            = 4,
+    restart         = 5
 } pmove_t;
 
 class Game {
