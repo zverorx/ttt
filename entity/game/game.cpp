@@ -22,56 +22,56 @@
 #include <unistd.h>
 #include <string.h>
 #include <pwd.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "game.h"
 
 enum color { red = 31, blue = 34};
 
 Game::Game()
-    : curr_p(0)
-    , prompt('>')
+    : prompt('>')
 {
-    passwd *pas = getpwuid(geteuid());
-    p1 = pas ? new Player(pas->pw_name, 'X') : new Player("Player", 'X');
+    passwd *pw = getpwuid(geteuid());
+    plr[man] = pw ? new Player(pw->pw_name, 'X') : new Player("Player", 'X');
 
-    p2 = new Player("><[O_O]><", 'O');
+    plr[bot] = new Player("><[O_O]><", 'O');
     ui = new ConsoleUI();
     terminal = new Terminal();
 }
 
 Game::~Game()
 {
-    delete p1;
-    delete p2;
+    delete plr[man];
+    delete plr[bot];
     delete ui;
     delete terminal;
 }
 
 pmove_t Game::Start()
 {
-    int rowi, coli;
+    int rowi, coli, curr_plr_i;
     pmove_t res_move;
 
     terminal->DisableICanon(0, 1);
     terminal->DisableEcho();
 
-    Intro();
+    curr_plr_i = Intro();
 
     terminal->DisableICanon(0, 4);
     terminal->EnableEcho();
 
-    for (int i = 0, move = 0, swtch = 0; ; i++) {
-        curr_p = i % 2 ? p1 : p2;
-        ui->Print(game_time, curr_p);
+    for (int i = 0, move = 0, swtch = 0; ; i++, curr_plr_i = !curr_plr_i) {
+        ui->Print(game_time, plr[curr_plr_i]);
 
         swtch = !swtch;
         if (swtch) { move++; }
 
         for (bool run = true; run;) {
-            res_move = ProcessPlayerMove(move, rowi, coli, i % 2 ? blue : red);
+            res_move = ProcessPlayerMove(move, rowi, coli, curr_plr_i ? red : blue);
             switch (res_move) {
                 case success:
-                    ui->SetMark(rowi, coli, *curr_p);
+                    ui->SetMark(rowi, coli, *plr[curr_plr_i]);
                     run = false;
                     break;
                 case quit: return quit;
@@ -80,11 +80,11 @@ pmove_t Game::Start()
                     return restart;
                 case invalid_input:
                     ui->Clear(); 
-                    ui->Print(input_error, curr_p);
+                    ui->Print(input_error, plr[curr_plr_i]);
                     break;
                 case cell_is_busy:
                     ui->Clear(); 
-                    ui->Print(busy_error, curr_p);
+                    ui->Print(busy_error, plr[curr_plr_i]);
                     break;
             }
         }
@@ -97,26 +97,30 @@ pmove_t Game::Start()
 
 void Game::Reset()
 {
-    delete p1;
-    delete p2;
+    delete plr[man];
+    delete plr[bot];
     delete ui;
     delete terminal;
 
-    passwd *pas = getpwuid(geteuid());
-    p1 = pas ? new Player(pas->pw_name, 'X') : new Player("Player", 'X');
+    passwd *pw = getpwuid(geteuid());
+    plr[man] = pw ? new Player(pw->pw_name, 'X') : new Player("Player", 'X');
 
-    p2 = new Player("         ><[O_O]><", 'O');
+    plr[bot] = new Player("><[O_O]><", 'O');
     ui = new ConsoleUI();
     terminal = new Terminal();
-
-    curr_p = 0;
 }
 
-void Game::Intro() const
+player_i Game::Intro() const
 {
     char buff[80];
+    player_i first_plr_indx;
+    int rnd;
 
-    ui->Print(info, p2);
+    srand(time(0));
+    rnd = rand();
+    first_plr_indx = rnd % 2 ? man : bot;
+
+    ui->Print(info, plr[first_plr_indx]);
 
     printf("%c PRESS ANY TO START...", prompt);
     getc(stdin);
@@ -127,6 +131,8 @@ void Game::Intro() const
     ui->AddMove(buff, sizeof(buff));
 
     ui->Clear();
+
+    return first_plr_indx;
 }
 
 pmove_t Game::ProcessPlayerMove(int move_count, int &rowi, 

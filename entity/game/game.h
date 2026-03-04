@@ -25,6 +25,8 @@
 #include "../console_ui/console_ui.h"
 #include "../terminal/terminal.h"
 
+enum player_i { man = 0, bot = 1, count = 2 };
+
 typedef enum player_move {
     success         = 0,
     invalid_input   = 1,
@@ -35,7 +37,7 @@ typedef enum player_move {
 
 class Game {
 private:
-    Player *p1, *p2, *curr_p;
+    Player *plr[count];
     ConsoleUI *ui;
     Terminal *terminal;
     const char prompt;
@@ -46,11 +48,12 @@ public:
 
     pmove_t Start();
     void Reset();
+
 private:
     Game(Game &g);
     void operator=(Game &g);
 
-    void Intro() const;
+    player_i Intro() const;
     pmove_t ProcessPlayerMove(int move_count, int &rowi, 
                               int &coli, int color_code) const;
 };
