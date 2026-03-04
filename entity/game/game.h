@@ -49,6 +49,16 @@ typedef enum player_move {
 } pmove_t;
 
 /**
+ * @enum game_over_stat
+ * @brief Game over status codes
+ * 
+ * @var win    Game is won by current player.
+ * @var draw   Game ended in a draw.
+ * @var absent Game is still in progress.
+ */
+enum game_over_stat { win, draw, absent };
+
+/**
  * @class Game
  * @brief The main class on gameplay management. 
  */
@@ -107,6 +117,14 @@ private:
      */
     pmove_t ProcessPlayerMove(int move_count, int &rowi, 
                               int &coli, int color_code) const;
+
+    /**
+     * @brief Checks if the game is over for current player
+     * 
+     * @param curr_plr_i Index of current player
+     * @return game_over_stat Game status: win, draw, or absent
+     */
+    game_over_stat CheckGameOver(player_i curr_plr_i);
 };
 
 #endif /* GAME_H_SENTRY */

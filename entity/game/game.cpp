@@ -94,6 +94,16 @@ pmove_t Game::Start()
         }
 
         ui->Clear();
+
+        int cgo_res = CheckGameOver(static_cast<player_i>(curr_plr_i));
+        if (cgo_res == win) {
+            ui->Print(game_over, plr[curr_plr_i]);
+            return quit;
+        }
+        else if (cgo_res == draw) {
+            ui->Print(game_over);
+            return quit;
+        }
     }
 
     return quit;
@@ -185,4 +195,58 @@ pmove_t Game::ProcessPlayerMove(int move_count, int &rowi,
     ui->AddMove(line_buff, sizeof(line_buff));
 
     return success;
+}
+
+game_over_stat Game::CheckGameOver(player_i curr_plr_i)
+{
+	int count, has_free_cells = 0;
+	char curr_mark = plr[curr_plr_i]->GetMark();
+    char mark;
+
+	/* Check by rows */
+	for(int i = 0; i < row_count; i++) {
+		count = 0;
+		for(int j = 0; j < col_count; j++) {
+			if(ui->IsBusy(i, j, mark)) {
+                if (mark == curr_mark) { count++; }
+            }
+            else { has_free_cells = 1; }
+			if(count == 3) { return win; }
+		}
+	}
+
+	/* Check by columns */
+	for(int i = 0; i < row_count; i++) {
+		count = 0;
+		for(int j = 0; j < col_count; j++) {
+			if(ui->IsBusy(j, i, mark)) {
+                if (mark == curr_mark) { count++; }
+            }
+            else { has_free_cells = 1; }
+			if(count == 3) { return win; }
+		}
+	}
+
+	/* Main diagonal */
+	for(int i = 0, count = 0; i < row_count; i++) {
+        if(ui->IsBusy(i, i, mark)) {
+            if (mark == curr_mark) { count++; }
+        }
+        else { has_free_cells = 1; }
+        if(count == 3) { return win; }
+	}
+
+	/* Secondary diagonal */
+	for(int i = 0, count = 0; i < row_count; i++) {
+        if(ui->IsBusy(i, 2 - i, mark)) {
+            if (mark == curr_mark) { count++; }
+        }
+        else { has_free_cells = 1; }
+        if(count == 3) { return win; }
+	}
+
+	/* Checking a draw */
+	if(!has_free_cells) { return draw; }
+
+	return absent; 
 }
