@@ -41,6 +41,7 @@ public:
      * @throws const char * on invalid arguments.
      */
     Player(const char *nickname, char mark);
+    virtual ~Player();
 
     const char *GetNickname() const;
     size_t GetLengthNickname() const;

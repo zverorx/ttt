@@ -33,6 +33,8 @@ Player::Player(const char *nickname, char mark)
     this->nickname[sizeof(this->nickname) - 1] = '\0';
 }
 
+Player::~Player() {}
+
 const char *Player::GetNickname() const
 {
     return nickname;
