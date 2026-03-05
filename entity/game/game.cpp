@@ -24,6 +24,7 @@
 #include <pwd.h>
 #include <stdlib.h>
 #include <time.h>
+#include <poll.h>
 
 #include "game.h"
 
@@ -153,30 +154,27 @@ pmove_t Game::ProcessPlayerMove(int move_count, int &rowi,
                                 int &coli, int color_code) const
 {
     char line_buff[80];
-    char input_buff[5];
+    char input_buff[10];
 
     memset(line_buff, 0, sizeof(line_buff));
     memset(input_buff, 0, sizeof(input_buff));
 
-    size_t size_input_buff = sizeof(input_buff);
-    size_t len_input_buff = size_input_buff - 1; /* minus '\0' */
-
     printf("\033[%dm%d%c\033[0m ", color_code, move_count, prompt);
+    fflush(stdout);
 
-    for (size_t i = 0; i < len_input_buff; i++) {
-        input_buff[i] = fgetc(stdin);
-        if (input_buff[i] == '\n') { break; }
-        if (i == len_input_buff - 1) {
-            fputc('\n', stdout); 
+    read(STDIN_FILENO, input_buff, sizeof(input_buff));
 
-            if (strcmp("quit", input_buff) == 0) { return quit; }
-            if (strcmp("rest", input_buff) == 0) { 
-                fputs("\033[1A", stdout);
-                return restart;
-            }
+    char *p = input_buff;
+    while ((p = strchr(p, '\n')) != 0) {
+        fputs("\033[2K\033[1A", stdout);
+        p++;
+    }
+    fputc('\n', stdout);
 
-            input_buff[i] = '\n';
-        }
+    if (strcmp("quit", input_buff) == 0) { return quit; }
+    if (strcmp("rest", input_buff) == 0) { 
+        fputs("\033[1A", stdout);
+        return restart;
     }
 
     fputs("\r\033[2K\033[1A", stdout);
