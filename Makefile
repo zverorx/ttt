@@ -10,12 +10,14 @@ BINDIR = bin
 SOURCES = main.cpp							\
 		  entity/game/game.cpp				\
 		  entity/player/player.cpp			\
+		  entity/bot/bot.cpp				\
 		  entity/console_ui/console_ui.cpp	\
 		  entity/terminal/terminal.cpp
 
 OBJECTS = $(OBJDIR)/main.o			\
 		  $(OBJDIR)/game.o			\
 		  $(OBJDIR)/player.o		\
+		  $(OBJDIR)/bot.o			\
 		  $(OBJDIR)/console_ui.o	\
 		  $(OBJDIR)/terminal.o
 
@@ -40,6 +42,7 @@ endif
 
 VPATH = entity/game			\
 		entity/player		\
+		entity/bot			\
 		entity/console_ui	\
 		entity/terminal
 
