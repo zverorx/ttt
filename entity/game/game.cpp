@@ -36,7 +36,7 @@ Game::Game()
     passwd *pw = getpwuid(geteuid());
     plr[man] = pw ? new Player(pw->pw_name, 'X') : new Player("Player", 'X');
 
-    plr[bot] = new Player("><[O_O]><", 'O');
+    plr[bot] = new Bot("><[O_O]><", 'O');
     ui = new ConsoleUI();
     terminal = new Terminal();
 }
@@ -69,7 +69,8 @@ pmove_t Game::Start()
         if (swtch) { move++; }
 
         for (bool run = true; run;) {
-            res_move = ProcessPlayerMove(move, rowi, coli, curr_plr_i ? red : blue);
+            res_move = ProcessPlayerMove(move, rowi, coli, 
+                                         static_cast<player_i>(curr_plr_i));
             switch (res_move) {
                 case success:
                     ui->SetMark(rowi, coli, *plr[curr_plr_i]);
@@ -120,9 +121,14 @@ void Game::Reset()
     passwd *pw = getpwuid(geteuid());
     plr[man] = pw ? new Player(pw->pw_name, 'X') : new Player("Player", 'X');
 
-    plr[bot] = new Player("><[O_O]><", 'O');
+    plr[bot] = new Bot("><[O_O]><", 'O');
     ui = new ConsoleUI();
     terminal = new Terminal();
+}
+
+const ConsoleUI &Game::GetUI() const
+{
+    return *ui;
 }
 
 player_i Game::Intro() const
@@ -151,18 +157,20 @@ player_i Game::Intro() const
 }
 
 pmove_t Game::ProcessPlayerMove(int move_count, int &rowi, 
-                                int &coli, int color_code) const
+                                int &coli, player_i plr_i ) const
 {
     char line_buff[80];
     char input_buff[10];
+    color clr = plr_i ? red : blue;
 
     memset(line_buff, 0, sizeof(line_buff));
     memset(input_buff, 0, sizeof(input_buff));
 
-    printf("\033[%dm%d%c\033[0m ", color_code, move_count, prompt);
+    printf("\033[%dm%d%c\033[0m ", clr, move_count, prompt);
     fflush(stdout);
 
-    read(STDIN_FILENO, input_buff, sizeof(input_buff));
+    if (plr_i == bot) { BotHandle(rowi, coli, input_buff, sizeof(input_buff)); }
+    else { read(STDIN_FILENO, input_buff, sizeof(input_buff)); }
 
     char *p = input_buff;
     while ((p = strchr(p, '\n')) != 0) {
@@ -189,7 +197,7 @@ pmove_t Game::ProcessPlayerMove(int move_count, int &rowi,
     }
 
     snprintf(line_buff, sizeof(line_buff), "\033[%dm%d%c\033[0m %d %d",
-             color_code, move_count, prompt, rowi, coli);
+             clr, move_count, prompt, rowi, coli);
     ui->AddMove(line_buff, sizeof(line_buff));
 
     return success;
@@ -247,4 +255,32 @@ game_over_stat Game::CheckGameOver(player_i curr_plr_i)
 	if(!has_free_cells) { return draw; }
 
 	return absent; 
+}
+
+void Game::BotHandle(int &rowi, int &coli, char *buff, size_t size) const
+{
+    if (size < 4) { return; }
+
+    static_cast<Bot *>(plr[bot])->Move(GetUI(), rowi, coli);
+
+    terminal->DisableEcho();
+
+    sleep(1);
+    printf("%d", rowi);
+    fflush(stdout);
+
+    sleep(1);
+    printf(" %d", coli);
+    fflush(stdout);
+
+    sleep(1);
+
+    terminal->EnableEcho();
+
+    tcflush(STDIN_FILENO, TCIFLUSH);
+
+    buff[0] = 48 + rowi;
+    buff[1] = ' ';
+    buff[2] = 48 + coli;
+    buff[3] = 0;
 }

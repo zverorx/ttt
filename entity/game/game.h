@@ -22,6 +22,7 @@
 #define GAME_H_SENTRY
 
 #include "../player/player.h"
+#include "../bot/bot.h"
 #include "../console_ui/console_ui.h"
 #include "../terminal/terminal.h"
 
@@ -89,6 +90,8 @@ public:
      */
     void Reset();
 
+    const ConsoleUI &GetUI() const;
+
 private:
     Game(Game &g);
     void operator=(Game &g);
@@ -111,12 +114,12 @@ private:
      * @param move_count Current move number (for display).
      * @param[out] rowi  Selected row (if input valid).
      * @param[out] coli  Selected column (if input valid).
-     * @param color_code ANSI color code for prompt.
+     * @param plr_i Index of the current player.
      * 
      * @return pmove_t Input result: success, errors, or commands.
      */
     pmove_t ProcessPlayerMove(int move_count, int &rowi, 
-                              int &coli, int color_code) const;
+                              int &coli, player_i plr_i) const;
 
     /**
      * @brief Checks if the game is over for current player
@@ -125,6 +128,19 @@ private:
      * @return game_over_stat Game status: win, draw, or absent
      */
     game_over_stat CheckGameOver(player_i curr_plr_i);
+
+    /**
+     * @brief Handles bot move generation and formats result into buffer.
+     * 
+     * @param rowi Reference to store bot's chosen row coordinate.
+     * @param coli Reference to store bot's chosen column coordinate.
+     * @param buff Output buffer for formatted move string "row col\0".
+     * @param size Size of the output buffer (must be at least 4).
+     * 
+     * @note Terminal echo is temporarily disabled during coordinate display.
+     * @note Input buffer is flushed after displaying coordinates.
+     */  
+    void BotHandle(int &rowi, int &coli, char *buff, size_t size) const;
 };
 
 #endif /* GAME_H_SENTRY */
