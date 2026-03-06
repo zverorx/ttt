@@ -1,7 +1,7 @@
 CXX ?= g++
 
 # Build mode: 'debug' or 'release'
-BUILD ?= debug
+BUILD ?= release
 
 TARGET = ttt
 OBJDIR = obj
