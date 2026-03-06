@@ -25,38 +25,111 @@
 #include "../player/player.h"
 #include "../player_i.h"
 
+/**
+ * @class Bot
+ * @brief The computer-controlled participant of the game.
+ */
 class Bot : public Player {
 private:
     /**
-     * @enum stat_size 
-     * @brief One of the sizes for Bot::move_stat
+     * @enum field_line 
+     * @brief All lines of the 3x3 field.
      * 
-     * 3 rows + 3 columns + 2 diagonals = 8
+     * @see Bot::move_stat
      */
-    enum stat_size { direction_count = 8 };
-
-    /**
-     * @enum stat_i
-     * @brief Indexes for Bot::move_stat
-     * @see enum stat_size
-     */
-    enum stat_i {
+    enum field_line {
         row0, row1, row2,
         col0, col1, col2,
-        d0, d1
+        d0, d1,
+        line_count = 8
     };
 
+    /**
+     * @brief Used to generate Bot::move_stat based 
+     *        on the current playing field.
+     */
     const ConsoleUI *ui;
-    int move_stat[direction_count][player_count];
+
+    /**
+     * @brief Statistics of marks on the playing field.
+     * 
+     * First index: player (bot or man).
+     * Second index: line (row, column or diagonal).
+     * Value: number of marks in that line.
+     * 
+     * @see enum player_i (first index)
+     * @see Bot::field_line (second index)
+     */
+    int move_stat[player_count][line_count];
 
 public:
     Bot(const char *nickname, char mark);
+
+    /**
+     * @brief Generates the bot's next move based on current field state.
+     * 
+     * @param ui Game interface for field access.
+     * @param[out] rowi Selected row.
+     * @param[out] coli Selected column.
+     */
     void Move(const ConsoleUI &ui, int &rowi, int &coli);
 
 private:
-    void StatDeterm(); 
-    bool NeedRandomMove() const;
+    /**
+     * @brief Determines move statistics by scanning the current field.
+     * 
+     * Counts marks for bot and opponent in each row, column and diagonal.
+     * Results are stored in Bot::move_stat array.
+     */
+    void StatDeterm();
+
+    /**
+     * @brief Checks whether the current move is the first one.
+     * 
+     * @return true if no bot marks on the game field, false otherwise.
+     */
+    bool IsFirstMove() const;
+
+    /**
+     * @brief Checks whether the bot can win in the current move.
+     * 
+     * @param[out] line The line where winning move is possible.
+     * @return true if winning move exists, false otherwise.
+     * 
+     * @note If return value is false, line contains invalid data.
+     */
+    bool IsCurrentMoveWin(field_line &line) const;
+
+    /**
+     * @brief Checks whether the opponent can win in the next move.
+     * 
+     * @param[out] line The line that needs to be blocked.
+     * @return true if opponent has a winning threat, false otherwise.
+     * 
+     * @note If return value is false, line contains invalid data.
+     */
+    bool IsNextMoveLoss(field_line &line) const;
+
+    /**
+     * @brief Generates a random free cell on the field.
+     * 
+     * @param[out] rowi Selected row.
+     * @param[out] coli Selected column.
+     * 
+     * @warning Randomly picks coordinates until an empty cell is found.
+     */
     void RandomMove(int &rowi, int &coli) const;
+
+    /**
+     * @brief Finds a free cell in the specified line.
+     * 
+     * @param[out] rowi Selected row.
+     * @param[out] coli Selected column.
+     * @param line The line to search for a free cell.
+     * 
+     * @note If no free cell in the line, output values are undefined.
+     */
+    void FillLine(int &rowi, int &coli, field_line line);
 };
 
 #endif /* BOT_H_SENTRY */
