@@ -25,49 +25,44 @@
 #include "../bot/bot.h"
 #include "../console_ui/console_ui.h"
 #include "../terminal/terminal.h"
-
-/**
- * @enum player_i
- * @brief Indexes for the array of players. 
- * @see Game::plr
- */
-enum player_i { man = 0, bot = 1, count = 2 };
-
-/**
- * @enum player_move
- * @brief User input result.
- * 
- * @see Game::ProcessPlayerMove
- * @see Game::Start
- */
-typedef enum player_move {
-    success         = 0,
-    invalid_input   = 1, 
-    cell_is_busy    = 2,
-    out_of_range    = 3,
-    quit            = 4, /**< Useful for Game::Start */
-    restart         = 5  /**< Useful for Game::Start */
-} pmove_t;
-
-/**
- * @enum game_over_stat
- * @brief Game over status codes
- * 
- * @var win    Game is won by current player.
- * @var draw   Game ended in a draw.
- * @var absent Game is still in progress.
- */
-enum game_over_stat { win, draw, absent };
+#include "../player_i.h"
 
 /**
  * @class Game
  * @brief The main class on gameplay management. 
  */
 class Game {
+public:
+    /**
+     * @enum player_move
+     * @brief User input result.
+     * 
+     * @see Game::ProcessPlayerMove
+     * @see Game::Start
+     */
+    typedef enum player_move {
+        success         = 0,
+        invalid_input   = 1, 
+        cell_is_busy    = 2,
+        out_of_range    = 3,
+        quit            = 4, /**< Useful for Game::Start */
+        restart         = 5  /**< Useful for Game::Start */
+    } pmove_t;
+
 private:
-    Player *plr[count]; /**< The participants of the game */
-    ConsoleUI *ui;      /**< Interface rendering */
-    Terminal *terminal; /**< Setting up a terminal session */
+    /**
+     * @enum game_over_stat
+     * @brief Game over status codes.
+     * 
+     * @var win    Game is won by current player.
+     * @var draw   Game ended in a draw.
+     * @var absent Game is still in progress.
+     */
+    enum game_over_stat { win, draw, absent };
+
+    Player *plr[player_count];  /**< The participants of the game */
+    ConsoleUI *ui;              /**< Interface rendering */
+    Terminal *terminal;         /**< Setting up a terminal session */
 
     const char prompt;  /**< A symbol indicating an input prompt */
 

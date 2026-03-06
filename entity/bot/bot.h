@@ -23,13 +23,40 @@
 
 #include "../console_ui/console_ui.h"
 #include "../player/player.h"
+#include "../player_i.h"
 
 class Bot : public Player {
 private:
+    /**
+     * @enum stat_size 
+     * @brief One of the sizes for Bot::move_stat
+     * 
+     * 3 rows + 3 columns + 2 diagonals = 8
+     */
+    enum stat_size { direction_count = 8 };
+
+    /**
+     * @enum stat_i
+     * @brief Indexes for Bot::move_stat
+     * @see enum stat_size
+     */
+    enum stat_i {
+        row0, row1, row2,
+        col0, col1, col2,
+        d0, d1
+    };
+
+    const ConsoleUI *ui;
+    int move_stat[direction_count][player_count];
 
 public:
     Bot(const char *nickname, char mark);
-    void Move(const ConsoleUI &ui, int &rowi, int &coli) const;
+    void Move(const ConsoleUI &ui, int &rowi, int &coli);
+
+private:
+    void StatDeterm(); 
+    bool NeedRandomMove() const;
+    void RandomMove(int &rowi, int &coli) const;
 };
 
 #endif /* BOT_H_SENTRY */

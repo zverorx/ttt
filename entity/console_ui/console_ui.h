@@ -24,52 +24,50 @@
 #include "../player/player.h"
 
 /**
- * @def GAMEPALY_SIZE
- * @brief ConsoleUI::gameplay size
- */
-#define GAMEPLAY_SIZE   10
-
-/**
- * @enum field_size
- * @brief The size of the playing field.
- */
-enum field_size { row_count = 3, col_count = 3 };
-
-/**
- * @enum panel_version
- * 
- * @brief Available panel display modes.
- * 
- * @var info Initial information panel.
- * @var game_time Active game panel.
- * @var input_error Game panel with input error message.
- * @var busy_error Game panel with busy cell message.
- * @var range_error Game panel with out of range message.
- * @var game_over Final panel showing winner.
- * 
- * @see Console::Print
- */
-enum panel_version { 
-    info, 
-    game_time, 
-    input_error, busy_error, range_error, 
-    game_over 
-};
-
-/**
  * @class ConsoleUI
  * @brief Rendering of info panels, playing field, and player moves.
  */
 class ConsoleUI {
+public:
+    /**
+     * @enum field_size
+     * @brief The size of the playing field.
+     */
+    enum field_size { row_count = 3, col_count = 3 };
+
+    /**
+     * @enum panel_version
+     * 
+     * @brief Available panel display modes.
+     * 
+     * @var info Initial information panel.
+     * @var game_time Active game panel.
+     * @var input_error Game panel with input error message.
+     * @var busy_error Game panel with busy cell message.
+     * @var range_error Game panel with out of range message.
+     * @var game_over Final panel showing winner.
+     * 
+     * @see ConsoleUI::Print
+     */
+    enum panel_version { 
+        info, 
+        game_time, 
+        input_error, busy_error, range_error, 
+        game_over 
+    };
+
 private:
     char field[row_count][col_count];   /**< Playing field          */
     const char default_fill;            /**< Default cell content   */
-    char *gameplay[GAMEPLAY_SIZE];      /**< Description of each move */
+
+    enum { gameplay_size = 10 };
+    char *gameplay[gameplay_size];      /**< Description of each move */
 
     int output_lines;                   /**< Lines printed to stdout*/
     const int panel_lines;              /**< Lines in info panel    */
     const int field_lines;              /**< Lines in playing field */
     const int separator_lines;          /**< Lines in separator     */
+
 public:
     ConsoleUI();
     ~ConsoleUI();
