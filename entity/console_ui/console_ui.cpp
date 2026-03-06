@@ -65,7 +65,7 @@ bool ConsoleUI::AddMove(const char *str, size_t len)
 {
     if (!str || len <= 0) { return false; }
 
-    for (int i = 0; i < GAMEPLAY_SIZE; i++) {
+    for (int i = 0; i < gameplay_size; i++) {
         if (gameplay[i] != 0) { continue; }
 
         gameplay[i] = static_cast<char *>(calloc(len + 1, sizeof(char)));
@@ -81,7 +81,7 @@ bool ConsoleUI::AddMove(const char *str, size_t len)
 
 bool ConsoleUI::DeleteMove(int index)
 {
-    if (index < 0 || index > GAMEPLAY_SIZE - 1) { return false; }
+    if (index < 0 || index > gameplay_size - 1) { return false; }
 
     free(gameplay[index]);
 
@@ -92,7 +92,7 @@ bool ConsoleUI::DeleteMove(int index)
     
 void ConsoleUI::DeleteAllMove()
 {
-    for (int i = 0; i < GAMEPLAY_SIZE; i++) {
+    for (int i = 0; i < gameplay_size; i++) {
         free(gameplay[i]);
         gameplay[i] = static_cast<char *>(0);
     }
@@ -281,7 +281,7 @@ void ConsoleUI::PrintGameplay()
     putc('\n', stdout);
     output_lines++;
 
-    for (int i = 0; i < GAMEPLAY_SIZE; i++) {
+    for (int i = 0; i < gameplay_size; i++) {
         if (gameplay[i]) {
             printf("%s\n", gameplay[i]);
             output_lines++;

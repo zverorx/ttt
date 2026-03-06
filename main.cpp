@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 {
     Game *game = new Game();
 
-    while (game->Start() == restart) { game->Reset(); }
+    while (game->Start() == Game::restart) { game->Reset(); }
 
     delete game;
     return 0;

@@ -27,8 +27,6 @@
 
 #include "game.h"
 
-enum color { red = 31, blue = 34};
-
 Game::Game()
     : prompt('>')
 {
@@ -48,7 +46,7 @@ Game::~Game()
     delete terminal;
 }
 
-pmove_t Game::Start()
+Game::pmove_t Game::Start()
 {
     int rowi, coli, curr_plr_i;
     pmove_t res_move;
@@ -62,7 +60,7 @@ pmove_t Game::Start()
     terminal->EnableEcho();
 
     for (int i = 0, move = 0, swtch = 0; ; i++, curr_plr_i = !curr_plr_i) {
-        ui->Print(game_time, plr[curr_plr_i]);
+        ui->Print(ConsoleUI::game_time, plr[curr_plr_i]);
 
         swtch = !swtch;
         if (swtch) { move++; }
@@ -81,15 +79,15 @@ pmove_t Game::Start()
                     return restart;
                 case invalid_input:
                     ui->Clear(); 
-                    ui->Print(input_error, plr[curr_plr_i]);
+                    ui->Print(ConsoleUI::input_error, plr[curr_plr_i]);
                     break;
                 case cell_is_busy:
                     ui->Clear(); 
-                    ui->Print(busy_error, plr[curr_plr_i]);
+                    ui->Print(ConsoleUI::busy_error, plr[curr_plr_i]);
                     break;
                 case out_of_range:
                     ui->Clear(); 
-                    ui->Print(range_error, plr[curr_plr_i]);
+                    ui->Print(ConsoleUI::range_error, plr[curr_plr_i]);
                     break;
             }
         }
@@ -98,11 +96,11 @@ pmove_t Game::Start()
 
         int cgo_res = CheckGameOver(static_cast<player_i>(curr_plr_i));
         if (cgo_res == win) {
-            ui->Print(game_over, plr[curr_plr_i]);
+            ui->Print(ConsoleUI::game_over, plr[curr_plr_i]);
             return quit;
         }
         else if (cgo_res == draw) {
-            ui->Print(game_over);
+            ui->Print(ConsoleUI::game_over);
             return quit;
         }
     }
@@ -140,7 +138,7 @@ player_i Game::Intro() const
     rnd = rand();
     first_plr_indx = rnd % 2 ? man : bot;
 
-    ui->Print(info, plr[first_plr_indx]);
+    ui->Print(ConsoleUI::info, plr[first_plr_indx]);
 
     printf("%c PRESS ANY TO START...", prompt);
     getc(stdin);
@@ -155,9 +153,11 @@ player_i Game::Intro() const
     return first_plr_indx;
 }
 
-pmove_t Game::ProcessPlayerMove(int move_count, int &rowi, 
+Game::pmove_t Game::ProcessPlayerMove(int move_count, int &rowi, 
                                 int &coli, player_i plr_i ) const
 {
+    enum color { red = 31, blue = 34};
+
     char line_buff[80];
     char input_buff[10];
     color clr = plr_i ? red : blue;
@@ -202,16 +202,16 @@ pmove_t Game::ProcessPlayerMove(int move_count, int &rowi,
     return success;
 }
 
-game_over_stat Game::CheckGameOver(player_i curr_plr_i)
+Game::game_over_stat Game::CheckGameOver(player_i curr_plr_i)
 {
 	int count, has_free_cells = 0;
 	char curr_mark = plr[curr_plr_i]->GetMark();
     char mark;
 
 	/* Check by rows */
-	for(int i = 0; i < row_count; i++) {
+	for(int i = 0; i < ConsoleUI::row_count; i++) {
 		count = 0;
-		for(int j = 0; j < col_count; j++) {
+		for(int j = 0; j < ConsoleUI::col_count; j++) {
 			if(ui->IsBusy(i, j, mark)) {
                 if (mark == curr_mark) { count++; }
             }
@@ -221,9 +221,9 @@ game_over_stat Game::CheckGameOver(player_i curr_plr_i)
 	}
 
 	/* Check by columns */
-	for(int i = 0; i < row_count; i++) {
+	for(int i = 0; i < ConsoleUI::row_count; i++) {
 		count = 0;
-		for(int j = 0; j < col_count; j++) {
+		for(int j = 0; j < ConsoleUI::col_count; j++) {
 			if(ui->IsBusy(j, i, mark)) {
                 if (mark == curr_mark) { count++; }
             }
@@ -233,7 +233,7 @@ game_over_stat Game::CheckGameOver(player_i curr_plr_i)
 	}
 
 	/* Main diagonal */
-	for(int i = 0, count = 0; i < row_count; i++) {
+	for(int i = 0, count = 0; i < ConsoleUI::row_count; i++) {
         if(ui->IsBusy(i, i, mark)) {
             if (mark == curr_mark) { count++; }
         }
@@ -242,7 +242,7 @@ game_over_stat Game::CheckGameOver(player_i curr_plr_i)
 	}
 
 	/* Secondary diagonal */
-	for(int i = 0, count = 0; i < row_count; i++) {
+	for(int i = 0, count = 0; i < ConsoleUI::row_count; i++) {
         if(ui->IsBusy(i, 2 - i, mark)) {
             if (mark == curr_mark) { count++; }
         }
