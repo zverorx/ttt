@@ -24,7 +24,6 @@
 #include <pwd.h>
 #include <stdlib.h>
 #include <time.h>
-#include <poll.h>
 
 #include "game.h"
 
