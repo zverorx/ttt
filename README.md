@@ -51,6 +51,38 @@ Follow the prompts on screen to play.
 
 Have a nice game!
 
+## Example of a game session
+
+```
+ _____________________________
+|         Tic Tac Toe         |
+|          GAME OVER          |
+|        The winner is        |
+|                             |
+|          ><[O_O]><          |
+|                             |
+| Commands:                   |
+| - quit (to exit)            |
+| - rest (to restart)         |
+|                             |
+|       Come back again!      |
+|_____________________________|
+
+[=============================]
+            0   1   2
+           ___ ___ ___
+        0 |_X_|___|_O_|
+        1 |___|_X_|_O_|
+        2 |___|___|_O_|
+
+0> START
+1> 2 2
+1> 0 0
+2> 1 2
+2> 1 1
+3> 0 2
+```
+
 ## License
 
 This project is licensed under the GPLv3. See the LICENSE file for more details.
